@@ -12,7 +12,9 @@
     "node": "~0.6.2"
   },
   "dependencies": {
-   "walk" : "*"
+   "walk" : "*",
+   "express" : "3.0",
+   "ejs" : "*"
   },
   "devDependencies": {}
 }

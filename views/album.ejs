@@ -1,0 +1,7 @@
+<h1><%= album.name %></h1>
+
+<ul>
+  <% album.photos.forEach(function(photo){ %>
+  <li><img src="<%= photo.path %>" alt="<%= photo.name%>"></img><%= photo.name%></li>
+  <% }) %>
+</ul>
