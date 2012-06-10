@@ -1,0 +1,11 @@
+.project
+.idea
+
+.settings
+.DS_Store
+*/.DS_Store
+.sass-cache
+.tmp_*
+/docs
+/docs/*
+node_modules
