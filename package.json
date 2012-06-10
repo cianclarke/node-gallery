@@ -1,0 +1,18 @@
+{
+  "author": "Cian Clarke <cian@cianclarke.com> (http://www.cianclarke.com)",
+  "name": "node-gallery",
+  "description": "NodeJS Photo Gallery using directory structure to output",
+  "version": "0.0.0",
+  "homepage": "http://www.github.com/cianclarke/node-gallery",
+  "repository": {
+    "url": ""
+  },
+  "main": "app.js",
+  "engines": {
+    "node": "~0.6.2"
+  },
+  "dependencies": {
+   "walk" : "*"
+  },
+  "devDependencies": {}
+}
