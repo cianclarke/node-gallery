@@ -3,13 +3,37 @@ util = require('util');
 
 var gallery = {
   /*
-   * Directory to initialize with
+   * Directory where the photos are contained
    */
   directory : undefined,
+
+  /*
+   * Optional static directory to prefix our directory references with
+   * This won't get output in templates - only needed if we've defined a static
+   * directory in a framework like express.
+   */
+  static: undefined,
+
+
+  /*
+   * root URL of the gallery - defaults to root, or '' - NOT '/'
+   * an example would be '/gallery', NOT '/gallery/'
+   */
+  rootURL: '',
+
   /*
    * Our constructed album JSON lives here
    */
   album: undefined,
+  /*
+   * Name of our gallery
+   */
+  name: 'Photo Gallery',
+
+  /*
+   * Image to display when no thumbnail could be located
+   */
+  noThumbnail: '', // TODO: Bundle a default no thumbnail image?
   /*
    * Filter string to use for excluding filenames. Defaults to a regular expression that excludes dotfiles.
    */
@@ -20,39 +44,30 @@ var gallery = {
   readFiles: function(params, cb){
     var walk    = require('walk'),
     files   = [],
+    directoryPath = (this.static) ? this.static + "/" + this.directory : this.directory,
     me = this;
 
-    var walker  = walk.walk(this.directory, { followLinks: false });
+
+    var walker  = walk.walk(directoryPath, { followLinks: false });
 
     walker.on('file', function(root, stat, next) {
       if (stat.name.match(me.filter) != null){
         return next();
       }
 
+      // Make the reference to the root photo have no ref to this.directory
+      var rootlessRoot = root.replace(directoryPath + "/", "");
+      rootlessRoot = rootlessRoot.replace(directoryPath, "");
+
       var file = {
         type: stat.type,
         name: stat.name,
-        root: root
+        root: rootlessRoot
       };
 
       files.push(file);
       return next();
 
-      /*
-       new ExifImage({ image : root + '/' + stat.name }, function (error, exifData) {
-       if (error){
-
-       file.exif = null;
-       files.push(file);
-       return next();
-       }else{
-       console.log('processing'); // Do something with your data!
-       file.exif = exifData;
-       files.push(file);
-       return next();
-       }
-       });
-       */
     });
 
     walker.on('end', function() {
@@ -64,7 +79,9 @@ var gallery = {
    */
   buildAlbums: function(files, cb){
     var albums = {
-      name: 'Root Album',
+      name: this.name,
+      root: true,
+      path: this.directory,
       photos: [],
       albums: []
     },
@@ -77,17 +94,21 @@ var gallery = {
       curAlbum = albums; // reset current album to root at each new file
 
       // Iterate over it's directory path, checking if we've got an album for each
-      for (var j=0; j<dirs.length; j++){
+      // ""!==dirs[0] as we don't want to iterate if we have a file that is a photo at root
+      for (var j=0; j<dirs.length && dirs[0]!==""; j++){
         var curDir = dirs[j];
         dirHashKey += curDir;
 
 
         if (!dirHash.hasOwnProperty(dirHashKey)){
           // If we've never seen this album before, let's create it
-          dirHash[dirHashKey] = true; // TODO - consider binding the album to this hash, and even REDIS-ing..
+          var currentAlbumPath = dirs.slice(0, j+1).join('/'); // reconstruct the current path with the path slashes
+          dirHash[dirHashKey] = true // TODO - consider binding the album to this hash, and even REDIS-ing..
+
           var newAlbum = {
             name: curDir,
             hash: dirHashKey,
+            path: currentAlbumPath,
             photos: [],
             albums: []
           };
@@ -116,14 +137,67 @@ var gallery = {
       // (either freshly created or located), push our file into it
       curAlbum.photos.push(photo);
     }
+
+
+    // Function to iterate over our completed albums, calling _buildThumbnails on each
+    function _recurseOverAlbums(al){
+      al.thumb = _buildThumbnails(al);
+      if (al.albums.length>0){
+        for (var i=0; i<al.albums.length; i++){
+          _recurseOverAlbums(al.albums[i]);
+        }
+      }
+    }
+
+    var me = this;
+
+    function _buildThumbnails(album){
+      var photoChildren = album.photos,
+      albumChildren = album.albums;
+
+      if (photoChildren.length && photoChildren.length>0){
+        return photoChildren[0].path;
+      }else{
+        if (albumChildren.length && albumChildren.length>1){
+          return _buildThumbnails(albumChildren[0]);
+        }else{
+          // TODO: No image could be found
+          return me.noThumbnail;
+        }
+      }
+    }
+
+    _recurseOverAlbums(albums);
+
     return cb(null, albums);
   },
   /*
    * Public API to node-gallery, currently just returns JSON block
    */
   init: function(params, cb){
-    var me =  this;
-    this.directory = params.directory;
+    var me =  this,
+    directory = params.directory,
+    staticDir = params.static;
+
+    // Massage our static directory and directory params into our expected format
+    // might be easier by regex..
+    if (staticDir.charAt(0)==="/"){
+      staticDir = staticDir.substring(1, staticDir.length);
+    }
+    if (directory.charAt(0)==="/"){
+      directory = directory.substring(1, directory.length);
+    }
+    if (directory.charAt(directory.length-1)==="/"){
+      directory.substring(0, directory.length-1); // yes length-1 - .lenght is the full string remember
+    }
+    if (staticDir.charAt(staticDir.length-1)==="/"){
+      staticDir.substring(0, staticDir.length-1); // yes length-1 - .lenght is the full string remember
+    }
+    this.directory = directory;
+    this.static = staticDir;
+    this.name = params.name || this.name;
+
+
     this.filter = params.filter || this.filter;
 
     this.readFiles(null, function(err, files){
@@ -159,8 +233,13 @@ var gallery = {
   },
   getAlbum: function(params, cb){
     var album = this.album,
-    albumPath = params.album,
-    dirs = albumPath.split('/');
+    albumPath = params.album;
+
+    if (!albumPath || albumPath==''){
+      return cb(null, album);
+    }
+
+    var dirs = albumPath.split('/');
 
 
     for (var i=0; i<dirs.length; i++){
@@ -181,7 +260,8 @@ var gallery = {
   },
   request: function(req, res, next){
     var ret = null, // photo or album to be returned
-    err = null; // error condition
+    err = null, // error condition
+    me = this;
 
     //getterFunction = (req.params.photo==null) ? this.getAlbum : this.getPhoto;
     if (req.params.photo && req.params.photo!==null){
@@ -199,6 +279,9 @@ var gallery = {
 
     // figure out what to do with our req, res, next...
     function end(err, data){
+      data.name = me.name;
+      data.directory= me.directory;
+      data.root = me.rootURL;
       if (err){
         req.err = err;
         if (next) return next(new Error(err));

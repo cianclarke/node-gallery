@@ -1,7 +1,32 @@
+<link href="/css/gallery.css" rel="stylesheet" type="text/css">
+<link href="/css/theme.css" rel="stylesheet" type="text/css">
+<a href="/album/<%= album.path.split("/").slice(0, album.path.split("/").length-1).join("/")%>">&laquo; Back</a>
 <h1><%= album.name %></h1>
 
-<ul>
-  <% album.photos.forEach(function(photo){ %>
-  <li><img src="<%= photo.path %>" alt="<%= photo.name%>"></img><%= photo.name%></li>
-  <% }) %>
-</ul>
+
+  <% if (album.albums.length>0){ %>
+  <h2>Albums</h2>
+  <ul class="albums">
+    <% album.albums.forEach(function(album){ %>
+      <li class="thumb">
+        <a href="../album/<%= album.path%>">
+          <div class="image"><img src="<%= root %>/<%= directory %>/<%= album.thumb %>" alt="<%= album.name%>"><br /></div>
+          <span class="caption"><%= album.name%></span>
+        </a>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+<% if (album.photos.length>0){ %>
+  <h2>Photos</h2>
+  <ul class="photos">
+    <% album.photos.forEach(function(photo){ %>
+      <li class="thumb">
+        <a href="<%= root %>/photo/<%= photo.path %>">
+          <img src="<%= root %>/<%= directory %>/<%= photo.path %>" alt="<%= photo.name%>"><br />
+          <%= photo.name%>
+        </a>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>

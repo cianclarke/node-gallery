@@ -1,0 +1,8 @@
+<link href="/css/gallery.css" rel="stylesheet" type="text/css">
+<link href="/css/theme.css" rel="stylesheet" type="text/css">
+<a href="<%= root %>/album/<%= photo.path.split("/").slice(0, photo.path.split("/").length-1).join("/")%>">&laquo; Back</a>
+
+<h1><%= photo.name %></h1>
+
+<img src="<%= root %>/<%= directory %>/<%= photo.path %>" alt="<%= photo.name%>"><br />
+<%= photo.name%>

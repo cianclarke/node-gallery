@@ -1,0 +1,19 @@
+ul li.thumb img{
+    max-width: 150px;
+    max-height: 150px;
+}
+ul li.thumb div.image {
+    width: 150px;
+    height: 150px;
+    padding: 2px;
+}
+ul li.thumb {
+    text-align: center;
+    list-style: none;
+    float: left;
+    width: 150px;
+    min-height: 170px;
+    margin: 10px;
+    padding: 4px;
+    border: 1px solid #ccc;
+}
