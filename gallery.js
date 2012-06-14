@@ -1,4 +1,5 @@
 var fs = require('fs'),
+exif = require('./exif.js'),
 util = require('util');
 
 var gallery = {
@@ -133,9 +134,21 @@ var gallery = {
         name: file.name,
         path: file.root + '/' + file.name
       };
-      // Now we have an accurate ref to curAlbum
-      // (either freshly created or located), push our file into it
+
       curAlbum.photos.push(photo);
+
+      // we have a photo object - let's try get it's exif data. We've
+      // already pushed into curAlbum, no rush getting exif now!
+      // Create a closure to give us scope to photo
+      (function(photo){
+        exif(photo, function(err, exifedPhoto){
+          // no need to do anything with our result - we've altered
+          // the photo object..
+        });
+      })(photo);
+
+
+
     }
 
 
@@ -226,6 +239,7 @@ var gallery = {
         var photo = photos[i];
         if (photo.name===photoName){
           return cb(null, photo);
+
         }
       }
 
