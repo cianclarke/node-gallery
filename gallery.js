@@ -1,5 +1,6 @@
 var fs = require('fs'),
 exif = require('./exif.js'),
+walk = require('walk'),
 util = require('util');
 
 var gallery = {
@@ -43,13 +44,23 @@ var gallery = {
    * Private function to walk a directory and return an array of files
    */
   readFiles: function(params, cb){
-    var walk    = require('walk'),
-    files   = [],
+    var files   = [],
     directoryPath = (this.static) ? this.static + "/" + this.directory : this.directory,
     me = this;
 
 
     var walker  = walk.walk(directoryPath, { followLinks: false });
+
+    walker.on("directories", function (root, dirStatsArray, next) {
+      // dirStatsArray is an array of `stat` objects with the additional attributes
+      // * type
+      // * error
+      // * name
+
+      next();
+    });
+
+
 
     walker.on('file', function(root, stat, next) {
       if (stat.name.match(me.filter) != null){
@@ -135,20 +146,21 @@ var gallery = {
         path: file.root + '/' + file.name
       };
 
-      curAlbum.photos.push(photo);
+      //curAlbum.photos.push(photo);
 
       // we have a photo object - let's try get it's exif data. We've
       // already pushed into curAlbum, no rush getting exif now!
       // Create a closure to give us scope to photo
-      (function(photo){
-        exif(photo, function(err, exifedPhoto){
+      (function(photo, curAlbum){
+        var fullPath = gallery.directory + "/" + photo.path;
+        fullPath = (gallery.static) ? gallery.static + "/" + fullPath: fullPath;
+
+        exif(fullPath, photo, function(err, exifPhoto){
           // no need to do anything with our result - we've altered
           // the photo object..
         });
-      })(photo);
-
-
-
+      })(photo, curAlbum);
+      curAlbum.photos.push(photo);
     }
 
 

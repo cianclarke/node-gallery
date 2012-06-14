@@ -15,7 +15,7 @@ app.configure(function(){
   app.use(express.static(__dirname + '/resources')); // NB - Example only, in production NEVER set root as express's static dir
 });
 
-app.get('/album?', function(req, res){
+app.get('/?album', function(req, res){
   gallery.request({}, res);
 });
 app.get('/album/*', function(req, res){

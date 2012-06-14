@@ -4,14 +4,18 @@ var ExifImage = require('exif').ExifImage;
  * Utility function to convert exif data into something a bit more consumable
  * by a template
  */
-var exif = function(photo, callback){
+var exif = function(staticPath, photo, callback){
   // We don't care about errors in here - we can always return an undefined exif
+  //console.log(staticPath);
   photo.exif = undefined;
-  try {
-    new ExifImage({ image : 'resources/photos/MG_4100.jpg' }, function (error, data) {
-      if (error)
+
+    try {
+    new ExifImage({ image : 'resources/photos/Ireland/West Coast/_MG_4174.jpg' }, function (error, data) {
+    // TODO: Finish this - runs out of memory when it gets it's own control over images!
+      if (error){
+        console.log('[exif.js] error in ' + staticPath + ': ' + JSON.stringify(error));
         return callback(null, photo);
-      else{
+      }else{
         var exifMap = {};
         var image = data.image,
         exif = data.exif,

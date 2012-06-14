@@ -17,5 +17,10 @@
    "ejs" : "*",
     "exif" : "git://github.com/gomfunkel/node-exif.git"
   },
-  "devDependencies": {}
+  "scripts": {
+    "test": "node test/tests.js"
+  },
+  "devDependencies": {
+    "colors" : "*"
+  }
 }
