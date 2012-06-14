@@ -211,11 +211,12 @@ var gallery = {
       })
     });
   },
-  getPhoto: function(params, cb){
+  getPhoto: function(req, cb){
     // bind the album name to the request
-    var photoName = params.photo,
+    var params = req.params,
+    photoName = params.photo,
     albumPath = params.album;
-    this.getAlbum(params, function(err, album){
+    this.getAlbum(req, function(err, album){
       if (err){
         return cb(err);
       }
@@ -231,8 +232,9 @@ var gallery = {
       return cb('Failed to load photo ' + photoName + ' in album ' + albumPath, null);
     });
   },
-  getAlbum: function(params, cb){
-    var album = this.album,
+  getAlbum: function(req, cb){
+    var params = req.params || {},
+    album = this.album,
     albumPath = params.album;
 
     if (!albumPath || albumPath==''){
@@ -263,17 +265,19 @@ var gallery = {
     err = null, // error condition
     me = this;
 
-    //getterFunction = (req.params.photo==null) ? this.getAlbum : this.getPhoto;
-    if (req.params.photo && req.params.photo!==null){
-      this.getPhoto(req.params, function(err, photo){
+    if (req && req.params && req.params.photo){
+      this.getPhoto(req, function(err, photo){
         req.photo = photo;
-        end(err, { type: 'photo', photo: photo});
+        req.back = photo.path.split("/").slice(0, photo.path.split("/").length-1).join("/"); // figure out up a level's URL
+        end(err, { type: 'photo', photo: photo, back: req.back});
 
       });
     }else{
-      this.getAlbum(req.params, function(err, album){
+      this.getAlbum(req, function(err, album){
         req.album = album;
-        end(err, {type: 'album', album: album});
+        req.back = album.path.split("/").slice(0, album.path.split("/").length-1).join("/"); // figure out up a level's URL
+
+        end(err, {type: 'album', album: album, back: req.back});
       });
     }
 

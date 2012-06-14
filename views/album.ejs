@@ -1,6 +1,8 @@
 <link href="/css/gallery.css" rel="stylesheet" type="text/css">
 <link href="/css/theme.css" rel="stylesheet" type="text/css">
-<a href="/album/<%= album.path.split("/").slice(0, album.path.split("/").length-1).join("/")%>">&laquo; Back</a>
+<% if (!album.root){ %>
+  <a href="/album/<%= back%>">&laquo; Back</a>
+<% } %>
 <h1><%= album.name %></h1>
 
 

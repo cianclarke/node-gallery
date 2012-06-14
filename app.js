@@ -15,14 +15,8 @@ app.configure(function(){
   app.use(express.static(__dirname + '/resources')); // NB - Example only, in production NEVER set root as express's static dir
 });
 
-app.get('/', function(req, res){
-  gallery.request({
-    params: {
-      photo: null,//'IMG_0229 _Medium_.JPG',
-      album: null//'Ireland/Co. Dublin'
-    }
-  },
-  res);
+app.get('/album?', function(req, res){
+  gallery.request({}, res);
 });
 app.get('/album/*', function(req, res){
   var resourcePath = req.params[0].trim(),
@@ -31,8 +25,7 @@ app.get('/album/*', function(req, res){
   paramsObj['album'] = resourcePath;
   gallery.request({
     params: paramsObj
-  },
-  res);
+  }, res);
 });
 
 app.get('/photo/*.:ext', function(req, res){
@@ -52,8 +45,7 @@ app.get('/photo/*.:ext', function(req, res){
   paramsObj['photo'] = photo + extension;
   gallery.request({
     params: paramsObj
-  },
-  res);
+  }, res);
 });
 
 app.listen(3000);

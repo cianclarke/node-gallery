@@ -14,7 +14,8 @@
   "dependencies": {
    "walk" : "*",
    "express" : "3.0",
-   "ejs" : "*"
+   "ejs" : "*",
+    "exif" : "git://github.com/gomfunkel/node-exif.git"
   },
   "devDependencies": {}
 }
