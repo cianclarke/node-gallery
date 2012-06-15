@@ -23,7 +23,7 @@ var gallery = {
    * This has no reflection on where the static assets are stored
    * it's just where our gallery lies in a URL router
    */
-  rootURL: '/gallery',
+  rootURL: '',
 
   /*
    * Our constructed album JSON lives here
@@ -221,6 +221,7 @@ var gallery = {
     if (staticDir.charAt(staticDir.length-1)==="/"){
       staticDir.substring(0, staticDir.length-1); // yes length-1 - .lenght is the full string remember
     }
+    this.rootURL = params.rootURL;
     this.directory = directory;
     this.static = staticDir;
     this.name = params.name || this.name;
@@ -312,7 +313,9 @@ var gallery = {
 
       // Construct the breadcrumb better.
       data.breadcrumb = [];
-      var breadSoFar = "" + me.rootURL + "/album";
+      var breadSoFar = "" + me.rootURL + "";
+      // Add a root level to the breadcrumb
+      data.breadcrumb.push({name: me.name, url: me.rootURL});
       for (var i=0; i<breadcrumb.length; i++){
         var b = breadcrumb[i];
         breadSoFar += "/" + breadcrumb[i];
