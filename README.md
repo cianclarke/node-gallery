@@ -8,6 +8,10 @@ Installation
 
     $ npm install node-gallery
 
+Examples
+===================
+A usage example can be found in App.js of node-gallery being consumed by Express. It should be simple to use with a framework of your choice - EJS templates are included.
+
 Usage
 ===================
 
@@ -44,3 +48,8 @@ Usage
     });
     gallery.request({}, res);
 
+Tests
+============
+Tests are written in raw javascript. To run,
+
+    $ npm test

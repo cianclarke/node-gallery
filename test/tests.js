@@ -14,10 +14,10 @@ exif("test/" + aPhoto.path, aPhoto, function(err, photo){
   assert.equal(photo.path, aPhoto.path);
   assert.ok(photo.exif);
   var ex = photo.exif;
-  assert.equal(ex.make, "Canon");
-  assert.equal(ex.model, "Canon EOS 20D");
-  assert.equal(ex.iso, "200");
-  assert.ok(ex.time);
+  assert.equal(ex.Make, "Canon");
+  assert.equal(ex.Model, "Canon EOS 20D");
+  assert.equal(ex.ISO, "200");
+  assert.ok(ex.Time);
   console.log('[exif] Pass ✓'.green);
 });
 
@@ -45,7 +45,6 @@ gallery.init(galleryParams, function(err, album){
   gallery.getPhoto(req, function(err, photo){
     console.log('[gallery.getPhoto()] Starting gallery tests'.yellow);
     assert.ok(!err);
-    console.log(photo);
     console.log('[gallery.getPhoto()] Pass ✓'.green);
   });
 
