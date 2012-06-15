@@ -19,47 +19,28 @@ app.get('/', function(req, res){
 });
 
 app.get('/gallery', function(req, res){
-  gallery.request({}, res);
+  gallery.request({}, function(err, data){
+    res.render(data.type + '.ejs', data);
+  });
 });
 app.get('/gallery/*', function(req, res){
   var path = req.params[0].trim(),
-  rex = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/,
-  image = rex.test(path),
+  isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/,
+  image = isFile.test(path),
   path = path.split("/");
-
-  if (image){
+  if (image){ // If we detect image file name at end, get filename
     image = path.pop();
   }
   path = path.join("/");
-
-  paramsObj = {};
-
   gallery.request({
     params: {
       album: path,
       photo: image
     }
-  }, res);
+  }, function(err, data){
+    console.log('cb');
+    res.render(data.type + '.ejs', data);
+  });
 });
-//
-//app.get('/' + rootUrl + '/*.:ext', function(req, res){
-//  var path = req.params.ext.trim(), // this makes no sense
-//  extension = '.' + req.params[0].trim(), // why are these out of order? Odd routing..
-//  paramsObj = {};
-//
-//
-//
-//  // Split the photo name and the path
-//  path = path.split("/");
-//  var photo = path.splice(path.length-1, 1)[0];
-//  path = path.join("/");
-//
-//
-//  paramsObj['album'] = path;
-//  paramsObj['photo'] = photo + extension;
-//  gallery.request({
-//    params: paramsObj
-//  }, res);
-//});
 
 app.listen(3000);

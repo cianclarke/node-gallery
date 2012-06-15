@@ -290,7 +290,7 @@ var gallery = {
     return cb(null, album);
 
   },
-  request: function(req, res, next){
+  request: function(req, callback){
     var ret = null, // photo or album to be returned
     err = null, // error condition
     me = this;
@@ -329,19 +329,8 @@ var gallery = {
       data.name = me.name;
       data.directory= me.directory;
       data.root = me.rootURL;
-      if (err){
-        req.err = err;
-        if (next) return next(new Error(err));
-        return;
-      }
 
-      if (next){
-        return next();
-      }else{
-        if (res.render){
-          res.render(data.type + '.ejs', data);
-        }
-      }
+      return callback(err, data);
     }
   }
 };
