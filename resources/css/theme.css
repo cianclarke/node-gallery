@@ -12,3 +12,7 @@ a {
     color: #666;
     text-decoration: none;
 }
+
+section.info {
+    background-color: #f8f8f8;
+}

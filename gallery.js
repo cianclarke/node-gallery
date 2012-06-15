@@ -20,8 +20,10 @@ var gallery = {
   /*
    * root URL of the gallery - defaults to root, or '' - NOT '/'
    * an example would be '/gallery', NOT '/gallery/'
+   * This has no reflection on where the static assets are stored
+   * it's just where our gallery lies in a URL router
    */
-  rootURL: '',
+  rootURL: '/gallery',
 
   /*
    * Our constructed album JSON lives here
@@ -141,8 +143,9 @@ var gallery = {
         }
       }
 
+      var photoName = file.name.replace(/.[^\.]+$/, "");
       var photo = {
-        name: file.name,
+        name: photoName,
         path: file.root + '/' + file.name
       };
 
@@ -239,7 +242,7 @@ var gallery = {
   getPhoto: function(req, cb){
     // bind the album name to the request
     var params = req.params,
-    photoName = params.photo,
+    photoName = params.photo.replace(/.[^\.]+$/, ""), // strip the extension
     albumPath = params.album;
     this.getAlbum(req, function(err, album){
       if (err){
@@ -293,22 +296,33 @@ var gallery = {
 
     if (req && req.params && req.params.photo){
       this.getPhoto(req, function(err, photo){
-        req.photo = photo;
-        req.back = photo.path.split("/").slice(0, photo.path.split("/").length-1).join("/"); // figure out up a level's URL
-        end(err, { type: 'photo', photo: photo, back: req.back});
-
+        end(err, { type: 'photo', photo: photo});
       });
     }else{
       this.getAlbum(req, function(err, album){
-        req.album = album;
-        req.back = album.path.split("/").slice(0, album.path.split("/").length-1).join("/"); // figure out up a level's URL
-
-        end(err, {type: 'album', album: album, back: req.back});
+        end(err, {type: 'album', album: album, back: req.back, breadcrumb: req.breadcrumb});
       });
     }
 
     // figure out what to do with our req, res, next...
     function end(err, data){
+      var item = data[data.type];
+      var breadcrumb = item.path.split("/");
+      var back = data.back = breadcrumb.slice(0, item.path.split("/").length-1).join("/"); // figure out up a level's URL
+
+      // Construct the breadcrumb better.
+      data.breadcrumb = [];
+      var breadSoFar = "" + me.rootURL + "/album";
+      for (var i=0; i<breadcrumb.length; i++){
+        var b = breadcrumb[i];
+        breadSoFar += "/" + breadcrumb[i];
+
+        data.breadcrumb.push({
+            name: breadcrumb[i],
+            url: breadSoFar
+        });
+      }
+
       data.name = me.name;
       data.directory= me.directory;
       data.root = me.rootURL;

@@ -15,10 +15,10 @@ app.configure(function(){
   app.use(express.static(__dirname + '/resources')); // NB - Example only, in production NEVER set root as express's static dir
 });
 
-app.get('/?album', function(req, res){
+app.get('/gallery/?album', function(req, res){
   gallery.request({}, res);
 });
-app.get('/album/*', function(req, res){
+app.get('/gallery/album/*', function(req, res){
   var resourcePath = req.params[0].trim(),
   paramsObj = {};
 
@@ -28,7 +28,7 @@ app.get('/album/*', function(req, res){
   }, res);
 });
 
-app.get('/photo/*.:ext', function(req, res){
+app.get('/gallery/photo/*.:ext', function(req, res){
   var path = req.params.ext.trim(), // this makes no sense
   extension = '.' + req.params[0].trim(), // why are these out of order? Odd routing..
   paramsObj = {};

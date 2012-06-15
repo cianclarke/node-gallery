@@ -6,12 +6,13 @@ var ExifImage = require('exif').ExifImage;
  */
 var exif = function(staticPath, photo, callback){
   // We don't care about errors in here - we can always return an undefined exif
-  //console.log(staticPath);
   photo.exif = undefined;
 
     try {
-    new ExifImage({ image : 'resources/photos/Ireland/West Coast/_MG_4174.jpg' }, function (error, data) {
-    // TODO: Finish this - runs out of memory when it gets it's own control over images!
+    new ExifImage({
+      image : staticPath//'resources/photos/Ireland/West Coast/_MG_4174.jpg'
+    }, function (error, data) {
+
       if (error){
         console.log('[exif.js] error in ' + staticPath + ': ' + JSON.stringify(error));
         return callback(null, photo);
@@ -25,21 +26,22 @@ var exif = function(staticPath, photo, callback){
         for (var i=0; i<arrays.length; i++){
           var t = arrays[i],
           careAbout = { // what props we're interested in, and what we call them in output, rather than silly exif-ey names
-            "Make" : "make",
-            "Model" : "model",
-            "DateTimeOriginal" : "time",
+            "Make" : "Make",
+            "Model" : "Model",
+            "DateTimeOriginal" : "Time",
             "ApertureValue" : "aperture",
             "FocalLength" : "focalLength",
-            "ISOSpeedRatings" : "iso",
-            "ExposureTime" : "shutterSpeed",
-            "GPSLatitude" : "lat",
-            "GPSLongitude" : "long"
+            "ISOSpeedRatings" : "ISO",
+            "ExposureTime" : "Shutter Speed",
+            "GPSLatitude" : "Lat",
+            "GPSLongitude" : "Long",
+            "ImageDescription" : "Description"
           };
           if (careAbout.hasOwnProperty(t.tagName)){
             var key = careAbout[t.tagName],
             value = t.value;
 
-            if (key == "exposureTime"){
+            if (key == "Shutter Speed"){
               // Transform shutter speed to a fraction
               value = dec2frac(value);
             }

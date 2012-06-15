@@ -1,10 +1,40 @@
 <link href="/css/gallery.css" rel="stylesheet" type="text/css">
 <link href="/css/theme.css" rel="stylesheet" type="text/css">
-<a href="<%= root %>/album/<%= photo.path.split("/").slice(0, photo.path.split("/").length-1).join("/")%>">&laquo; Back</a>
+<% for (var i=0; i<breadcrumb.length; i++) { %>
+  <% if (i==breadcrumb.length-1){ %>
+    <%= breadcrumb[i].name %>
+  <% }else{ %>
+    <a href="<%= breadcrumb[i].url %>"> <%= breadcrumb[i].name %> &raquo; </a>
+  <% } %>
+
+<% } %>
 
 <h1><%= photo.name %></h1>
 
-<img src="<%= root %>/<%= directory %>/<%= photo.path %>" alt="<%= photo.name%>"><br />
-<%= photo.name%>
+<img src="/<%= directory %>/<%= photo.path %>" alt="<%= photo.name%>"><br />
 
-<%= JSON.stringify(photo.exif) %>
+<% if (photo.exif && photo.exif.Description){ %>
+<%= photo.exif.Description%>
+<% }else{ %>
+<%= photo.name%>
+<% } %>
+
+
+
+<section class="info">
+  <h2>Info</h2>
+  <table>
+    <% for (var key in photo.exif){ %>
+    <% if (key!="Description"){ %>
+    <tr>
+      <td>
+        <%= key %>
+      </td>
+      <td>
+        <%= photo.exif[key] %>
+      </td>
+    </tr>
+    <% } %>
+    <% } %>
+  </table>
+</section>
