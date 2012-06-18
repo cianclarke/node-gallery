@@ -12,15 +12,17 @@
     "node": "~0.6.2"
   },
   "dependencies": {
-   "walk" : "*",
-   "express" : "3.0",
-   "ejs" : "*",
-    "exif" : "git://github.com/gomfunkel/node-exif.git"
+    "walk": "*",
+    "express": "3.0",
+    "ejs": "*",
+    "exif": "git://github.com/gomfunkel/node-exif.git"
   },
   "scripts": {
-    "test": "node test/tests.js"
+    "test": "node test/tests.js",
+    "start": "app.js"
   },
   "devDependencies": {
-    "colors" : "*"
-  }
+    "colors": "*"
+  },
+  "subdomain": "node-gallery"
 }

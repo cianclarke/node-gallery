@@ -240,35 +240,48 @@ var gallery = {
       })
     });
   },
+  /*
+   * Returns a photo. Usage:
+   * getPhoto({ photo: 'test.jpg', album: 'Ireland'}, function(err, photo){
+   *   console.log(photo.path);
+   * );
+   */
   getPhoto: function(req, cb){
     // bind the album name to the request
     var params = req.params,
     photoName = params.photo.replace(/.[^\.]+$/, ""), // strip the extension
     albumPath = params.album;
-    this.getAlbum(req, function(err, album){
+    this.getAlbum(req, function(err, data){
       if (err){
         return cb(err);
       }
-
+      var album = data.album;
       var photos = album.photos;
       for (var i=0; i<photos.length; i++){
         var photo = photos[i];
         if (photo.name===photoName){
-          return cb(null, photo);
 
+          return gallery.afterGettingItem(null, {type: 'photo', photo: photo}, cb);
         }
       }
 
       return cb('Failed to load photo ' + photoName + ' in album ' + albumPath, null);
     });
   },
+  /*
+   * Function to return a specific album. Usage:
+   * gallery.getAlbum({ album: 'Ireland/Waterford', function(err, album){
+   *   console.log(album.path);
+   * });
+   */
   getAlbum: function(req, cb){
     var params = req.params || {},
     album = this.album,
     albumPath = params.album;
 
     if (!albumPath || albumPath==''){
-      return cb(null, album);
+      //return cb(null, album);
+      return this.afterGettingItem(null, {type: 'album', album: album}, cb);
     }
 
     var dirs = albumPath.split('/');
@@ -287,50 +300,47 @@ var gallery = {
     if (album.hash !== albumPath.replace(/\//g, "")){
       return cb('Failed to load album ' + albumPath, null);
     }
-    return cb(null, album);
+    return this.afterGettingItem(null, {type: 'album', album: album}, cb);
 
   },
-  request: function(req, callback){
-    var ret = null, // photo or album to be returned
-    err = null, // error condition
-    me = this;
+  /*
+   * Private function which massages the return type into something useful to a website.
+   * Builds stuff like a breadcrumb, back URL..
+   */
+  afterGettingItem: function(err, data, cb){
+    var item = data[data.type];
+    var breadcrumb = item.path.split("/");
+    var back = data.back = breadcrumb.slice(0, item.path.split("/").length-1).join("/"); // figure out up a level's URL
 
-    if (req && req.params && req.params.photo){
-      this.getPhoto(req, function(err, photo){
-        end(err, { type: 'photo', photo: photo});
-      });
-    }else{
-      this.getAlbum(req, function(err, album){
-        end(err, {type: 'album', album: album, back: req.back, breadcrumb: req.breadcrumb});
+    // Construct the breadcrumb better.
+    data.breadcrumb = [];
+    var breadSoFar = "" + this.rootURL + "";
+    // Add a root level to the breadcrumb
+    data.breadcrumb.push({name: this.name, url: this.rootURL});
+    for (var i=0; i<breadcrumb.length; i++){
+      var b = breadcrumb[i];
+      breadSoFar += "/" + breadcrumb[i];
+
+      data.breadcrumb.push({
+        name: breadcrumb[i],
+        url: breadSoFar
       });
     }
 
-    // figure out what to do with our req, res, next...
-    function end(err, data){
-      var item = data[data.type];
-      var breadcrumb = item.path.split("/");
-      var back = data.back = breadcrumb.slice(0, item.path.split("/").length-1).join("/"); // figure out up a level's URL
+    data.name = this.name;
+    data.directory= this.directory;
+    data.root = this.rootURL;
 
-      // Construct the breadcrumb better.
-      data.breadcrumb = [];
-      var breadSoFar = "" + me.rootURL + "";
-      // Add a root level to the breadcrumb
-      data.breadcrumb.push({name: me.name, url: me.rootURL});
-      for (var i=0; i<breadcrumb.length; i++){
-        var b = breadcrumb[i];
-        breadSoFar += "/" + breadcrumb[i];
-
-        data.breadcrumb.push({
-            name: breadcrumb[i],
-            url: breadSoFar
-        });
-      }
-
-      data.name = me.name;
-      data.directory= me.directory;
-      data.root = me.rootURL;
-
-      return callback(err, data);
+    return cb(err, data);
+  },
+  /*
+   * TODO: Deprecate this / bring into middleware
+   */
+  request: function(req, callback){
+    if (req && req.params && req.params.photo){
+      this.getPhoto(req, callback);
+    }else{
+      this.getAlbum(req, callback);
     }
   }
 };

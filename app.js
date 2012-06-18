@@ -20,6 +20,7 @@ app.get('/', function(req, res){
 
 app.get('/gallery', function(req, res){
   gallery.request({}, function(err, data){
+
     res.render(data.type + '.ejs', data);
   });
 });
@@ -38,7 +39,6 @@ app.get('/gallery/*', function(req, res){
       photo: image
     }
   }, function(err, data){
-    console.log('cb');
     res.render(data.type + '.ejs', data);
   });
 });
