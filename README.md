@@ -42,16 +42,21 @@ Usage (Standalone)
     });
 
     /*
-     * Now we can use gallery.request to pass web requests through to node-gallery
+     * Now we can use gallery.getPhoto or gallery.getAlbum to pass web requests through to node-gallery
      */
+    gallery.getAlbum({
+          album: 'Ireland/Co. Waterford',
+        }, function(err, album){
+          // photo contains a JSON object representing our album.
+          // Now, we'd pass this photo to ejs.render('views/album.ejs', album);
+    });
 
-    gallery.request({
-      params: {
-        album: 'Ireland/Co. Waterford',
-        photo: 'IMG_2040.jpg'
-      }
-    }, function(err, data){
-      // data contains a JSON object representing our album or photo
+    gallery.getPhoto({
+      album: 'Ireland/Co. Waterford',
+      photo: 'IMG_2040.jpg'
+    }, function(err, photo){
+      // photo contains a JSON object representing our photo.
+      // Now, we'd pass this photo to ejs.render('views/photo.ejs', photo);
     });
 
 

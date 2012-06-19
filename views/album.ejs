@@ -31,7 +31,7 @@
   <ul class="photos">
     <% album.photos.forEach(function(photo){ %>
       <li class="thumb">
-        <a href="<%=root %>/<%= photo.path %>">
+        <a href="<%=root %><%= photo.path %>">
           <img src="/<%= directory %>/<%= photo.path %>" alt="<%= photo.name%>"><br />
           <%= photo.name%>
         </a>

@@ -256,12 +256,11 @@ var gallery = {
    *   console.log(photo.path);
    * );
    */
-  getPhoto: function(req, cb){
+  getPhoto: function(params, cb){
     // bind the album name to the request
-    var params = req.params,
-    photoName = params.photo.replace(/.[^\.]+$/, ""), // strip the extension
+    var photoName = params.photo.replace(/.[^\.]+$/, ""), // strip the extension
     albumPath = params.album;
-    this.getAlbum(req, function(err, data){
+    this.getAlbum(params, function(err, data){
       if (err){
         return cb(err);
       }
@@ -284,9 +283,8 @@ var gallery = {
    *   console.log(album.path);
    * });
    */
-  getAlbum: function(req, cb){
-    var params = req.params || {},
-    album = this.album,
+  getAlbum: function(params, cb){
+    var album = this.album,
     albumPath = params.album;
 
     if (!albumPath || albumPath==''){
@@ -329,10 +327,13 @@ var gallery = {
     data.breadcrumb.push({name: this.name, url: this.rootURL});
     for (var i=0; i<breadcrumb.length; i++){
       var b = breadcrumb[i];
+      if (b==""){
+        continue;
+      }
       breadSoFar += "/" + breadcrumb[i];
 
       data.breadcrumb.push({
-        name: breadcrumb[i],
+        name: b,
         url: breadSoFar
       });
     }
@@ -350,7 +351,8 @@ var gallery = {
       var url = req.url,
       rootURL = gallery.rootURL,
       params = req.params,
-      requestParams = {};
+      requestParams = {},
+      image = false;
 
 
       if (rootURL=="" || url.indexOf(rootURL)===-1){
@@ -367,8 +369,8 @@ var gallery = {
 
       if (url && url!==""){
         var path = url.trim(),
-        isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/,
-        image = isFile.test(path.toLowerCase()),
+        isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/;
+        image = isFile.test(path.toLowerCase());
         path = path.split("/");
         if (image){ // If we detect image file name at end, get filename
           image = path.pop();
@@ -382,23 +384,13 @@ var gallery = {
 
       }
 
-      gallery.request({
-        params: requestParams
-      }, function(err, data){
+      var getterFunction = (image) ? gallery.getPhoto : gallery.getAlbum;
+
+      getterFunction.apply(gallery, [ requestParams, function(err, data){
         req.gallery = data;
         return next(err);
         //Should we do this here? res.render(data.type + '.ejs', data);
-      });
-    }
-  },
-  /*
-   * TODO: Deprecate this / bring into middleware
-   */
-  request: function(req, callback){
-    if (req && req.params && req.params.photo){
-      this.getPhoto(req, callback);
-    }else{
-      this.getAlbum(req, callback);
+      }]);
     }
   }
 };
