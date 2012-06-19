@@ -12,41 +12,46 @@ Examples
 ===================
 A usage example can be found in App.js of node-gallery being consumed by Express. It should be simple to use with a framework of your choice - EJS templates are included.
 
-Usage
+Usage (ExpressJS)
+===================
+    /*
+     * Tested using Express 3.0 alpha - full example in 'app.js'
+     */
+
+    // Setup our app to use gallery middleware - also does init
+    app.configure(function(){
+      app.use(gallery.middleware({static: 'resources', directory: '/photos', rootURL: "/gallery"}));
+    });
+
+    // now, our middleware does gallery lookups for every URL under rootURL - e.g. /gallery
+    app.get('/gallery*', function(req, res){
+      // We automatically have the gallery data available to us in req thanks to middleware
+      var data = req.gallery;
+      // and we can res.render using one of the supplied templates (photo.ejs/album.ejs) or one of our own
+      res.render(data.type + '.ejs', data);
+    });
+
+
+Usage (Standalone)
 ===================
 
     gallery.init({
       static: 'resources',
       directory: '/photos',
-      rootURL: rootURL
-    }, function(err, album){
-      // album is a JSON block representing the photo album.
-      // watch for [exif] errors in the console at this point - any malformed images cause issues.
-      // we've now imported the photos & their exif, good to go.
+      rootURL: '/gallery'
     });
 
     /*
      * Now we can use gallery.request to pass web requests through to node-gallery
-     * Here's an example using Express - for more, see app.js
      */
 
-    app.get('/gallery/*', function(req, res){
-      var path = req.params[0].trim(),
-      isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/,
-      image = isFile.test(path),
-      path = path.split("/");
-      if (image){ // If we detect image file name at end, get filename
-        image = path.pop();
+    gallery.request({
+      params: {
+        album: 'Ireland/Co. Waterford',
+        photo: 'IMG_2040.jpg'
       }
-      path = path.join("/");
-      gallery.request({
-        params: {
-          album: path,
-          photo: image
-        }
-      }, res);
-    });
-    gallery.request({}, res);
+    }, res);
+
 
 Tests
 ============

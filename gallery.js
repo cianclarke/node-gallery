@@ -207,9 +207,19 @@ var gallery = {
     directory = params.directory,
     staticDir = params.static;
 
+    if (!cb || typeof cb !=="function"){
+      cb = function(err){
+        if (err) {
+          throw new Error(err.toString());
+        }
+      };
+    }
+
+    if (!directory) throw new Error('`directory` is a required parameter');
+
     // Massage our static directory and directory params into our expected format
     // might be easier by regex..
-    if (staticDir.charAt(0)==="/"){
+    if (staticDir && staticDir.charAt(0)==="/"){
       staticDir = staticDir.substring(1, staticDir.length);
     }
     if (directory.charAt(0)==="/"){
@@ -332,6 +342,57 @@ var gallery = {
     data.root = this.rootURL;
 
     return cb(err, data);
+  },
+  middleware: function(options){
+    this.init(options);
+
+    return function(req, res, next){
+      var url = req.url,
+      rootURL = gallery.rootURL,
+      params = req.params,
+      requestParams = {};
+
+
+      if (rootURL=="" || url.indexOf(rootURL)===-1){
+        // Not the right URL. We have no business here. Onwards!
+        return next();
+      }
+
+      url = url.replace(rootURL, "");
+      // Do some URL massaging - wouldn't have to do this if .params were accessible?
+      if (url.charAt(0)==="/"){
+        url = url.substring(1, url.length);
+      }
+      url =decodeURIComponent(url);
+
+      if (url && url!==""){
+        var path = url.trim(),
+        isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/,
+        image = isFile.test(path.toLowerCase()),
+        path = path.split("/");
+        if (image){ // If we detect image file name at end, get filename
+          image = path.pop();
+        }
+        path = path.join("/").trim();
+
+        requestParams = {
+          album: path,
+          photo: image
+        };
+
+      }
+
+
+
+      debugger;
+      gallery.request({
+        params: requestParams
+      }, function(err, data){
+        req.gallery = data;
+        return next(err);
+        //Should we do this here? res.render(data.type + '.ejs', data);
+      });
+    }
   },
   /*
    * TODO: Deprecate this / bring into middleware
