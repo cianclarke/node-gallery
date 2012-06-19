@@ -382,9 +382,6 @@ var gallery = {
 
       }
 
-
-
-      debugger;
       gallery.request({
         params: requestParams
       }, function(err, data){

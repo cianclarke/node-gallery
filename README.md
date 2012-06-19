@@ -10,7 +10,7 @@ Installation
 
 Examples
 ===================
-A usage example can be found in App.js of node-gallery being consumed by Express. It should be simple to use with a framework of your choice - EJS templates are included.
+A usage example using node-gallery with Express can be found in app.js. It should be simple to use with a framework of your choice - EJS templates are included.
 
 Usage (ExpressJS)
 ===================
@@ -50,7 +50,9 @@ Usage (Standalone)
         album: 'Ireland/Co. Waterford',
         photo: 'IMG_2040.jpg'
       }
-    }, res);
+    }, function(err, data){
+      // data contains a JSON object representing our album or photo
+    });
 
 
 Tests
