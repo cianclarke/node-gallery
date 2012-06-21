@@ -1,10 +1,12 @@
 node-gallery
 ============
 
-NodeJS Photo Gallery. Feed it a directory of photos, get back a JSON object & a styled photo gallery ready for the web.
+NodeJS Photo Gallery. Feed it a directory of photos, get back a JSON object & a styled photo gallery ready for the web. 
 * No database needed
-* Reads EXIF data for comments etc
-* No setup time - just throw some photos into a directory!
+* Folders titles = Album titles
+* Image titles = Photo Titles
+* EXIF title = Description
+* Displays camera capture info (exposure, aperture, ISO..)
 
 Installation
 ============
