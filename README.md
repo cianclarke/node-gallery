@@ -1,7 +1,10 @@
 node-gallery
 ============
 
-NodeJS Photo Gallery. Expects a directory of photos, builds a JSON object from this & outputs a styled photo gallery.
+NodeJS Photo Gallery. Feed it a directory of photos, get back a JSON object & a styled photo gallery ready for the web.
+* No database needed
+* Reads EXIF data for comments etc
+* No setup time - just throw some photos into a directory!
 
 Installation
 ============
