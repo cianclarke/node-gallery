@@ -15,6 +15,7 @@ var exif = function(staticPath, photo, callback){
 
       if (error){
         console.log('[exif.js] error in ' + staticPath + ': ' + JSON.stringify(error));
+        photo.exif = false;
         return callback(null, photo);
       }else{
         var exifMap = {};
