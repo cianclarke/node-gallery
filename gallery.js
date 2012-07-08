@@ -2,6 +2,7 @@ var fs = require('fs'),
 exif = require('./exif.js'),
 walk = require('walk'),
 util = require('util');
+//im = require('imagemagick'); // TODO: For thumbs.
 
 var gallery = {
   /*
@@ -70,13 +71,14 @@ var gallery = {
       }
 
       // Make the reference to the root photo have no ref to this.directory
+
       var rootlessRoot = root.replace(directoryPath + "/", "");
       rootlessRoot = rootlessRoot.replace(directoryPath, "");
 
       var file = {
         type: stat.type,
         name: stat.name,
-        root: rootlessRoot
+        rootDir: rootlessRoot
       };
 
       files.push(file);
@@ -94,7 +96,7 @@ var gallery = {
   buildAlbums: function(files, cb){
     var albums = {
       name: this.name,
-      root: true,
+      isRoot: true,
       path: this.directory,
       photos: [],
       albums: []
@@ -103,7 +105,7 @@ var gallery = {
     for (var i=0; i<files.length; i++){
       // Process a single file
       var file = files[i],
-      dirs = file.root.split("/"),
+      dirs = file.rootDir.split("/"),
       dirHashKey = "",
       curAlbum = albums; // reset current album to root at each new file
 
@@ -146,7 +148,7 @@ var gallery = {
       var photoName = file.name.replace(/.[^\.]+$/, "");
       var photo = {
         name: photoName,
-        path: file.root + '/' + file.name
+        path: file.rootDir + '/' + file.name
       };
 
       //curAlbum.photos.push(photo);
@@ -340,11 +342,12 @@ var gallery = {
 
     data.name = this.name;
     data.directory= this.directory;
-    data.root = this.rootURL;
+    data.rootDir = this.rootURL;
 
     return cb(err, data);
   },
   middleware: function(options){
+    var me = this;
     this.init(options);
 
     return function(req, res, next){
@@ -355,7 +358,26 @@ var gallery = {
       image = false;
 
 
-      if (rootURL=="" || url.indexOf(rootURL)===-1){
+
+      var staticTest = /\.png|\.jpg|\.css|\.js/i;
+      if (rootURL=="" || url.indexOf(rootURL)===-1 /*|| staticTest.test(url)*/){
+
+//     This isn't working just quite yet, let's skip over it
+//        var thumbTest =  /[a-zA-Z0-9].*(\.png|\.jpg)&tn=1/i;
+//        if (thumbTest.test(url)){
+//          url = req.url = url.replace("&tn=1", "");
+//          console.log("[url:]" + url);
+//          console.log("[static:]" + me.static);
+//          var imagePath = me.static + decodeURI(url);
+//          im.resize({
+//            srcData: fs.readFileSync(imagePath, 'binary'),
+//            width:   256
+//          }, function(err, binary, stderr){
+//            if (err) util.inspect(err);
+//            req.send(binary);
+//          });
+//
+//        }
         // Not the right URL. We have no business here. Onwards!
         return next();
       }
