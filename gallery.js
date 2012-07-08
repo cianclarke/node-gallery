@@ -109,7 +109,7 @@ var gallery = {
       dirHashKey = "",
       curAlbum = albums; // reset current album to root at each new file
 
-      // Iterate over it's directory path, checking if we've got an album for each
+      // Iterate over its directory path, checking if we've got an album for each
       // ""!==dirs[0] as we don't want to iterate if we have a file that is a photo at root
       for (var j=0; j<dirs.length && dirs[0]!==""; j++){
         var curDir = dirs[j];
