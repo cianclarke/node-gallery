@@ -24,4 +24,4 @@ app.get('/gallery*', function(req, res){
 });
 
 app.listen(port);
-console.log('node-gallery listening on localhost:3000');
+console.log('node-gallery listening on localhost:' + port);
