@@ -23,9 +23,6 @@
         <a href="<%= rootDir%>/<%= album.path%>">
           <div class="image"><img src="/<%= directory %>/<%= album.thumb %>" alt="<%= album.name%>"><br /></div>
           <span class="caption"><%= album.name%></span>
-          <% if (album.description){ %>
-            <p><%- album.description %></p>
-          <% } %>
         </a>
       </li>
     <% }) %>
