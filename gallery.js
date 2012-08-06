@@ -96,6 +96,7 @@ var gallery = {
   buildAlbums: function(files, cb){
     var albums = {
       name: this.name,
+      prettyName: this.name,
       isRoot: true,
       path: this.directory,
       photos: [],
@@ -109,7 +110,7 @@ var gallery = {
       dirHashKey = "",
       curAlbum = albums; // reset current album to root at each new file
 
-      // Iterate over its directory path, checking if we've got an album for each
+      // Iterate over it's directory path, checking if we've got an album for each
       // ""!==dirs[0] as we don't want to iterate if we have a file that is a photo at root
       for (var j=0; j<dirs.length && dirs[0]!==""; j++){
         var curDir = dirs[j];
@@ -123,6 +124,7 @@ var gallery = {
 
           var newAlbum = {
             name: curDir,
+            prettyName: decodeURIComponent(curDir),
             description: "",
             hash: dirHashKey,
             path: currentAlbumPath,
@@ -146,10 +148,25 @@ var gallery = {
         }
       }
       path = file.rootDir + '/' + file.name
-      if(file.name == "info.txt") {
+      if(file.name == "info.json") {
         var fullPath = gallery.directory + "/" + path;
         fullPath = (gallery.static) ? gallery.static + "/" + fullPath: fullPath;
-        curAlbum.description = fs.readFileSync(fullPath);
+        var info = fs.readFileSync(fullPath);
+        try{
+          info = JSON.parse(info);
+        }catch(e){
+          // If invalid JSON, just bail..
+          continue;
+        }
+        curAlbum.description = info.description || null;
+        curAlbum.prettyName = info.name || curAlbum.prettyName;
+
+        if (info.thumb || info.thumbnail){
+          var thumbnailImage = info.thumb || info.thumbnail;
+          thumbnailImage = curAlbum.path + "/" + thumbnailImage;
+          curAlbum.thumb = thumbnailImage;
+        }
+
       } else {
         var photoName = file.name.replace(/.[^\.]+$/, "");
         var photo = {
@@ -178,7 +195,11 @@ var gallery = {
 
     // Function to iterate over our completed albums, calling _buildThumbnails on each
     function _recurseOverAlbums(al){
-      al.thumb = _buildThumbnails(al);
+
+      if (!al.thumb){
+        al.thumb = _buildThumbnails(al); // only set this album's thumbanil if not already done in info.json
+      }
+
       if (al.albums.length>0){
         for (var i=0; i<al.albums.length; i++){
           _recurseOverAlbums(al.albums[i]);
