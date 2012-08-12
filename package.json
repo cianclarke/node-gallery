@@ -2,12 +2,12 @@
   "author": "Cian Clarke <cian@cianclarke.com> (http://www.cianclarke.com)",
   "name": "node-gallery",
   "description": "NodeJS Photo Gallery using directory structure & exif info to output a gallery",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "homepage": "http://www.github.com/cianclarke/node-gallery",
   "repository": {
     "url": ""
   },
-  "main": "app.js",
+  "main": "gallery.js",
   "engines": {
     "node": "~0.6.2"
   },
