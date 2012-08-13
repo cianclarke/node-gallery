@@ -1,8 +1,9 @@
 var fs = require('fs'),
 exif = require('./exif.js'),
 walk = require('walk'),
-util = require('util');
-//im = require('imagemagick'); // TODO: For thumbs.
+util = require('util'),
+path = require('path'),
+im = require('imagemagick');
 
 var gallery = {
   /*
@@ -43,6 +44,10 @@ var gallery = {
    * Filter string to use for excluding filenames. Defaults to a regular expression that excludes dotfiles.
    */
   filter: /^Thumbs.db|^\.[a-zA-Z0-9]+/,
+  /*
+   * Object used to store binary chunks that represent image thumbs
+   */
+  imageCache: {},
   /*
    * Private function to walk a directory and return an array of files
    */
@@ -147,9 +152,9 @@ var gallery = {
           }
         }
       }
-      path = file.rootDir + '/' + file.name
+      var filepath = file.rootDir + '/' + file.name
       if(file.name == "info.json") {
-        var fullPath = gallery.directory + "/" + path;
+        var fullPath = gallery.directory + "/" + filepath;
         fullPath = (gallery.static) ? gallery.static + "/" + fullPath: fullPath;
         var info = fs.readFileSync(fullPath);
         try{
@@ -171,7 +176,7 @@ var gallery = {
         var photoName = file.name.replace(/.[^\.]+$/, "");
         var photo = {
           name: photoName,
-          path: path
+          path: filepath
         };
   
         //curAlbum.photos.push(photo);
@@ -214,7 +219,8 @@ var gallery = {
       albumChildren = album.albums;
 
       if (photoChildren.length && photoChildren.length>0){
-        return photoChildren[0].path;
+        var albumThumb = photoChildren[0].path;
+        return albumThumb;
       }else{
         if (albumChildren.length && albumChildren.length>1){
           return _buildThumbnails(albumChildren[0]);
@@ -391,21 +397,35 @@ var gallery = {
       if (rootURL=="" || url.indexOf(rootURL)===-1 /*|| staticTest.test(url)*/){
 
 //     This isn't working just quite yet, let's skip over it
-//        var thumbTest =  /[a-zA-Z0-9].*(\.png|\.jpg)&tn=1/i;
-//        if (thumbTest.test(url)){
-//          url = req.url = url.replace("&tn=1", "");
-//          console.log("[url:]" + url);
-//          console.log("[static:]" + me.static);
-//          var imagePath = me.static + decodeURI(url);
-//          im.resize({
-//            srcData: fs.readFileSync(imagePath, 'binary'),
-//            width:   256
-//          }, function(err, binary, stderr){
-//            if (err) util.inspect(err);
-//            req.send(binary);
-//          });
-//
-//        }
+        var thumbTest =  /[a-zA-Z0-9].*(\.png|\.jpg)&tn=1/i;
+        if (thumbTest.test(url)){
+          url = req.url = url.replace("&tn=1", "");
+          var imagePath = me.static + decodeURI(url);
+          if (me.imageCache[imagePath]){
+            res.contentType('image/jpg');
+            res.end(me.imageCache[imagePath], 'binary');
+          }else{
+            fs.readFile(imagePath, 'binary', function(err, file){
+              if (err){
+                console.log(err);
+                return res.send(err);
+              }
+              im.resize({
+                srcData: file,
+                width:   256
+              }, function(err, binary, stderr){
+                if (err){
+                  util.inspect(err);
+                  res.send('error generating thumb');
+                }
+                res.contentType('image/jpg');
+                res.end(binary, 'binary');
+                me.imageCache[imagePath] = binary;
+              });
+            });
+          }
+          return;
+        }
         // Not the right URL. We have no business here. Onwards!
         return next();
       }
@@ -418,17 +438,17 @@ var gallery = {
       url =decodeURIComponent(url);
 
       if (url && url!==""){
-        var path = url.trim(),
+        var filepath = url.trim(),
         isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/;
-        image = isFile.test(path.toLowerCase());
-        path = path.split("/");
+        image = isFile.test(filepath.toLowerCase());
+        filepath = filepath.split("/");
         if (image){ // If we detect image file name at end, get filename
-          image = path.pop();
+          image = filepath.pop();
         }
-        path = path.join("/").trim();
+        filepath = filepath.join("/").trim();
 
         requestParams = {
-          album: path,
+          album: filepath,
           photo: image
         };
 
