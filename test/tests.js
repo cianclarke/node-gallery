@@ -37,13 +37,13 @@ gallery.init(galleryParams, function(err, album){
   console.log('[gallery] Pass ✓'.green);
 
   var req = {
-    params: {
-      photo: 'lake.jpg',
-      album: 'album1'
-    }
+    photo: '_MG_3169.jpg',
+    album: '/Co. Dublin'
   };
+
   gallery.getPhoto(req, function(err, photo){
     console.log('[gallery.getPhoto()] Starting gallery tests'.yellow);
+    console.log(err);
     assert.ok(!err);
     console.log('[gallery.getPhoto()] Pass ✓'.green);
   });
