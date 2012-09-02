@@ -8,8 +8,8 @@ gallery = require('../gallery.js');
  * Test the Exif module
  */
 var aPhoto = { name: 'SomePhoto', path: 'photos/lake.jpg' };
+console.log('[exif] Starting exif tests'.yellow);
 exif("test/" + aPhoto.path, aPhoto, function(err, photo){
-  console.log('[exif] Starting exif tests'.yellow);
   assert.equal(photo.name, aPhoto.name);
   assert.equal(photo.path, aPhoto.path);
   assert.ok(photo.exif);
@@ -26,8 +26,8 @@ exif("test/" + aPhoto.path, aPhoto, function(err, photo){
  * Test the Gallery module
  */
 var galleryParams = {static: 'test', directory: '/photos', name: 'Test Gallery'};
+console.log('[gallery] Starting gallery tests'.yellow);
 gallery.init(galleryParams, function(err, album){
-  console.log('[gallery] Starting gallery tests'.yellow);
   assert.ok(!err);
   assert.equal(album.name, galleryParams.name);
   assert.equal(album.albums.length, 1); // OK with empty directories being excluded - bit lazy..
@@ -37,13 +37,12 @@ gallery.init(galleryParams, function(err, album){
   console.log('[gallery] Pass ✓'.green);
 
   var req = {
-    photo: '_MG_3169.jpg',
-    album: '/Co. Dublin'
+    photo: 'lake.jpg',
+    album: 'album1'
   };
 
+  console.log('[gallery.getPhoto()] Starting gallery tests'.yellow);
   gallery.getPhoto(req, function(err, photo){
-    console.log('[gallery.getPhoto()] Starting gallery tests'.yellow);
-    console.log(err);
     assert.ok(!err);
     console.log('[gallery.getPhoto()] Pass ✓'.green);
   });
