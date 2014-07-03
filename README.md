@@ -13,6 +13,18 @@ Installation
 ============
 
     $ npm install node-gallery
+    
+ImageMagick
+===========
+Node Gallery does require ImageMagick. Installation instructions for mac can be found at: http://www.imagemagick.org/script/binary-releases.php#macosx  
+  
+For windows:
+
+1. Select imagemagick installer for your system, e.g., http://sourceforge.net/projects/imagemagick/files/6.8.9-exes/ImageMagick-6.8.9-4-Q16-x64-dll.exe/download
+2. Install imagemagick
+3. Make sure that imagemagick tools are available on system path (e.g., you can test if you can run "convert.exe" from CMD)
+4. Restart cygwin, CMD or whatever you use to fire up node.js
+
 
 Examples
 ===================
