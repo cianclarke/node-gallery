@@ -10,7 +10,7 @@ function getheight(images, width) {
   width -= images.length * 5;
   var h = 0;
   for (var i = 0; i < images.length; ++i) {
-    h += $(images[i]).data('width') / $(images[i]).data('height');
+    h += $(images[i]).get(0).width / $(images[i]).get(0).height;
   }
   return width / h;
 }
@@ -19,10 +19,10 @@ function setheight(images, height) {
   HEIGHTS.push(height);
   for (var i = 0; i < images.length; ++i) {
     $(images[i]).css({
-      width: height * $(images[i]).data('width') / $(images[i]).data('height'),
+      width: height * $(images[i]).get(0).width / $(images[i]).get(0).height,
       height: height
     });
-    $(images[i]).attr('src', $(images[i]).attr('src').replace(/w[0-9]+-h[0-9]+/, 'w' + $(images[i]).width() + '-h' + $(images[i]).height()));
+    $(images[i]).attr('src', $(images[i]).attr('src').replace(/w[0-9]+-h[0-9]+/, 'w' + $(images[i]).get(0).width + '-h' + $(images[i]).get(0).height));
   }
 }
 
@@ -54,8 +54,8 @@ function run(max_height) {
   console.log(n);
 }
 
-window.addEventListener('resize', function () { run(205); });
-$(function () { run(205); });
+window.addEventListener('resize', function () { run(800); });
+$(function () { run(320); });
 
 });
 </script>
