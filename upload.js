@@ -1,18 +1,26 @@
-var fs = require('fs');
+var fs = require('fs'),
+	busboy = require('connect-busboy'),
+	util = require('util');
 
-function saveFile(tmpPath,fileName,folderName) {
-	fs.readFile(tempPath, function(err,data) {
-		if(err) throw err;
-		console.log("Saving file from "+tmpPath+" using name "+fileName+", to folder "+folderName);
-	});
-}
-
-exports.receive = function(req) {
+exports.receive = function(req,res) {
 	console.log("Receive called on upload module...");
-	console.log("Req.files is "+reg.files.length+" items long.");
-	fileNames = keys(reg.files);
-	for(var count = 0; count < reg.file.length; count ++) {
-		saveFile(fileNames[i].path, filenames[i].name, "joopajoo"); 
-	}
+	var fstream;
+	var folderName = undefined;
+    req.pipe(req.busboy);
+
+    req.busboy.on('field', function(fieldname, val) {
+      console.log('Field [' + fieldname + ']: value: ' + util.inspect(val));
+      if(fieldname == 'albumName') {
+      	folderName = val;
+      }
+    }); 
+    req.busboy.on('file', function (fieldname, file, filename) {
+        console.log("Uploading: " + filename); 
+        fstream = fs.createWriteStream(__dirname + '/resources/'+folderName+	'/' + filename);
+        file.pipe(fstream);
+        fstream.on('close', function () {
+            res.redirect('back');
+        });
+    });
 };
 

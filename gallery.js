@@ -152,7 +152,8 @@ var gallery = {
                 var photoName = file.name.replace(/.[^\.]+$/, "");
                 var photo = {
                     name: photoName,
-                    path: filepath
+                    path: filepath,
+                    width: 
                 };
                 //curAlbum.photos.push(photo);
                 // we have a photo object - let's try get it's exif data. We've
