@@ -1,6 +1,7 @@
 // Usage example with ExpressJS
 var gallery = require('./gallery'),
     express = require('express'),
+    upload = require('./upload'),
     util = require('util'),
     port = 3000;
 var app = (parseFloat(express.version) < 3.0) ? express.createServer() : express();
@@ -16,10 +17,18 @@ app.configure(function() {
 app.get('/', function(req, res) {
     res.redirect('/gallery');
 });
+app.get('/upload', function(req, res) {
+	console.log("Rendering upload page.");
+	res.render('upload.ejs');
+});
 app.get('/gallery*', function(req, res) {
     var data = req.gallery;
     data.layout = false; // Express 2.5.* support, don't look for layout.ejs
     res.render(data.type + '.ejs', data);
 });
+app.post('/gallery*', function(req, res) {
+	upload.receive(req);
+});
+
 app.listen(port);
 console.log('node-gallery listening on localhost:' + port);
