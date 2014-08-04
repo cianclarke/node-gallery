@@ -20,12 +20,6 @@ app.configure(function() {
 app.get('/', function(req, res) {
     res.redirect('/gallery');
 });
-/*app.get('/gallery/upload', function(req, res) {
-	var data = req.gallery;
-	data.layout = false;
-	console.log("Rendering upload page.");
-	res.render('upload.ejs',data);
-});*/
 app.get('/gallery*', function(req, res) {
     var data = req.gallery;
     data.layout = false; // Express 2.5.* support, don't look for layout.ejs
