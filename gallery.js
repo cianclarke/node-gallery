@@ -281,7 +281,11 @@ var gallery = {
     },
 
     getInterface: function(params, cb) {
-        return cb(null, {type: 'upload', album: this.album, directory : "/"});
+        if (params.photo == 'upload') {
+            return cb(null, {type: 'upload', album: this.album, directory : "/"});
+        } else if (params.photo == 'listing') {
+            return cb(null, {type: 'listing', listing: JSON.stringify(this.album)});
+        }
     },
     /*
      * Function to return a specific album. Usage:
@@ -411,14 +415,19 @@ var gallery = {
             var filepath = url.trim(),
             isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/;
             isUpload = /upload$/;
+            isListing = /list$/;
             filepath = filepath.split("/");
-            console.log("FilePath tested is: "+filepath[filepath.length-1]);
-            if(isFile.test(filepath[filepath.length-1].toLowerCase())) {
+            lastItem = filepath[filepath.length-1].toLowerCase();
+            console.log("FilePath last item tested is: "+lastItem);
+            if(isFile.test(lastItem)) {
                 currentType = gallery.resourceType.IMAGE;
                 resourceName = filepath.pop();
-            } else if (isUpload.test(filepath[filepath.length-1].toLowerCase())) {
+            } else if (isUpload.test(lastItem)) {
                 currentType = gallery.resourceType.INTERFACE;
                 resourceName = 'upload';
+            } else if (isListing.test(lastItem)) {
+                currentType = gallery.resourceType.INTERFACE;
+                resourceName = 'listing';
             } else {
                 filepath = filepath.join("/").trim();
                 currentType = gallery.resourceType.ALBUM;
