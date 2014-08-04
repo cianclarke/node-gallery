@@ -4,6 +4,7 @@ var fs = require('fs'),
     util = require('util'),
     path = require('path'),
     im = require('imagemagick');
+
 var gallery = {
     /*
      * Directory where the photos are contained
@@ -42,6 +43,12 @@ var gallery = {
      * Object used to store binary chunks that represent image thumbs
      */
     imageCache: {},
+    resourceType : {
+        IMAGE : 0,
+        ALBUM : 1,
+        INTERFACE : 2
+    },
+    resourceName: undefined,
     /*
      * Private function to walk a directory and return an array of files
      */
@@ -152,8 +159,7 @@ var gallery = {
                 var photoName = file.name.replace(/.[^\.]+$/, "");
                 var photo = {
                     name: photoName,
-                    path: filepath,
-                    width: 
+                    path: filepath
                 };
                 //curAlbum.photos.push(photo);
                 // we have a photo object - let's try get it's exif data. We've
@@ -273,6 +279,10 @@ var gallery = {
             return cb('Failed to load photo ' + photoName + ' in album ' + albumPath, null);
         });
     },
+
+    getInterface: function(params, cb) {
+        return cb(null, {type: 'upload', album: this.album, directory : "/"});
+    },
     /*
      * Function to return a specific album. Usage:
      * gallery.getAlbum({ album: 'Ireland/Waterford', function(err, album){
@@ -342,16 +352,18 @@ var gallery = {
     },
     middleware: function(options) {
         var me = this;
+        var currentType = undefined;
         this.init(options);
         return function(req, res, next) {
             var url = req.url,
                 rootURL = gallery.rootURL,
                 params = req.params,
-                requestParams = {},
-                image = false;
+                requestParams = {};
             var staticTest = /\.png|\.jpg|\.css|\.js/i;
+            console.log("Middleware: url is: "+url);
             if (rootURL == "" || url.indexOf(rootURL) === -1 /*|| staticTest.test(url)*/ ) {
                 //     This isn't working just quite yet, let's skip over it
+                console.log("in the cache generation....");
                 var thumbTest = /[a-zA-Z0-9].*(\.png|\.jpg)&tn=1/i;
                 if (thumbTest.test(url)) {
                     url = req.url = url.replace("&tn=1", "");
@@ -394,21 +406,43 @@ var gallery = {
                 url = url.substring(1, url.length);
             }
             url = decodeURIComponent(url);
-            if (url && url !== "") {
-                var filepath = url.trim(),
-                    isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/;
-                image = isFile.test(filepath.toLowerCase());
-                filepath = filepath.split("/");
-                if (image) { // If we detect image file name at end, get filename
-                    image = filepath.pop();
-                }
+            console.log("Url used in routing: "+url);
+            
+            var filepath = url.trim(),
+            isFile = /\b.(jpg|bmp|jpeg|gif|png|tif)\b$/;
+            isUpload = /upload$/;
+            filepath = filepath.split("/");
+            console.log("FilePath tested is: "+filepath[filepath.length-1]);
+            if(isFile.test(filepath[filepath.length-1].toLowerCase())) {
+                currentType = gallery.resourceType.IMAGE;
+                resourceName = filepath.pop();
+            } else if (isUpload.test(filepath[filepath.length-1].toLowerCase())) {
+                currentType = gallery.resourceType.INTERFACE;
+                resourceName = 'upload';
+            } else {
                 filepath = filepath.join("/").trim();
-                requestParams = {
-                    album: filepath,
-                    photo: image
-                };
+                currentType = gallery.resourceType.ALBUM;
+                resourceName = null;
             }
-            var getterFunction = (image) ? gallery.getPhoto : gallery.getAlbum;
+            requestParams = {
+                album: filepath,
+                photo: resourceName
+            };
+         
+            var getterFunction;
+            console.log("current type is "+currentType);
+            if (currentType == gallery.resourceType.IMAGE) {
+                console.log("Hander is getPhoto.");
+                getterFunction = gallery.getPhoto;
+            } else if(currentType == gallery.resourceType.INTERFACE) {
+                console.log("Handler is getInterface.");
+                getterFunction = gallery.getInterface;
+            } else if(currentType == gallery.resourceType.ALBUM) {
+                console.log("Handler is getAlbum.");
+                getterFunction = gallery.getAlbum;
+            } else {
+                console.log("Handler is undefined!");
+            }
             getterFunction.apply(gallery, [requestParams,
                 function(err, data) {
                     req.gallery = data;
