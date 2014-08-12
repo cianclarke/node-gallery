@@ -11,4 +11,4 @@ approot=/home/flowebadm/ekukka_gallery
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 (cd $reporoot && git submodule update)
 (cd $reporoot && git pull && git checkout master)
-(cp -r "$submodroot/*" "$approot/")
+(cp -R "$submodroot/*" "$approot/")
