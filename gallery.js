@@ -3,7 +3,8 @@ var fs = require('fs'),
     walk = require('walk'),
     util = require('util'),
     path = require('path'),
-    im = require('imagemagick');
+    im = require('imagemagick')
+    nodeCache = require('node-cache');
 
 var gallery = {
     /*
@@ -42,7 +43,7 @@ var gallery = {
     /*
      * Object used to store binary chunks that represent image thumbs
      */
-    imageCache: {},
+    imageCache: new nodeCache(),
     resourceType : {
         IMAGE : 0,
         ALBUM : 1,
@@ -380,10 +381,11 @@ var gallery = {
                 if (thumbTest.test(url)) {
                     url = req.url = url.replace("&tn=1", "");
                     var imagePath = me.static + decodeURI(url);
-                    if (me.imageCache[imagePath]) {
+                    var cacheObject = me.imageCache.get(imagePath);
+                    if (Object.keys(cacheObject).length != 0) {
                         console.log("Cache hit for thumbnail: "+imagePath);
                         res.contentType('image/jpg');
-                        res.end(me.imageCache[imagePath], 'binary');
+                        res.end(cacheObject, 'binary');
                     } else {
                         console.log("Adding "+imagePath+" to thumbnail cache.");
                         fs.readFile(imagePath, 'binary', function(err, file) {
@@ -402,7 +404,7 @@ var gallery = {
                                     }
                                     res.contentType('image/jpg');
                                     res.end(binary, 'binary');
-                                    me.imageCache[imagePath] = binary;
+                                    me.imageCache.set(imagePath, binary);
                                 });
                             } catch (error) {
                                 console.log("Error in cache entry generation.");
