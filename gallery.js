@@ -284,7 +284,16 @@ var gallery = {
         if (params.photo == 'upload') {
             return cb(null, {type: 'upload', album: this.album, directory : "/"});
         } else if (params.photo == 'listing') {
-            return cb(null, {type: 'listing', listing: JSON.stringify(this.album)});
+            console.log("Seeking album "+params.album+" from "+this.album.albums.length+" albums.");
+            for (var i = 0; i < this.album.albums.length; i++) {
+                var album = this.album.albums[i];
+                console.log("Comparing "+album.path+" and "+params.album);  
+                console.log("i is "+i);         
+                if (album.path == params.album) {
+                    return cb(null, {type: 'listing', listing: JSON.stringify(this.album)});
+                } 
+            } 
+            return cb(null, {type: 'listing', listing: JSON.stringify(null)});
         }
     },
     /*
@@ -428,6 +437,8 @@ var gallery = {
             } else if (isListing.test(lastItem)) {
                 currentType = gallery.resourceType.INTERFACE;
                 resourceName = 'listing';
+                //for getting the folder's name in listing
+                filepath = filepath[filepath.length-2];
             } else {
                 filepath = filepath.join("/").trim();
                 currentType = gallery.resourceType.ALBUM;
