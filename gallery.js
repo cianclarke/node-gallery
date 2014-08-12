@@ -376,15 +376,16 @@ var gallery = {
             console.log("Middleware: url is: "+url);
             if (rootURL == "" || url.indexOf(rootURL) === -1 /*|| staticTest.test(url)*/ ) {
                 //     This isn't working just quite yet, let's skip over it
-                console.log("in the cache generation....");
                 var thumbTest = /[a-zA-Z0-9].*(\.png|\.jpg)&tn=1/i;
                 if (thumbTest.test(url)) {
                     url = req.url = url.replace("&tn=1", "");
                     var imagePath = me.static + decodeURI(url);
                     if (me.imageCache[imagePath]) {
+                        console.log("Cache hit for thumbnail: "+imagePath);
                         res.contentType('image/jpg');
                         res.end(me.imageCache[imagePath], 'binary');
                     } else {
+                        console.log("Adding "+imagePath+" to thumbnail cache.");
                         fs.readFile(imagePath, 'binary', function(err, file) {
                             if (err) {
                                 console.log(err);
@@ -393,18 +394,20 @@ var gallery = {
                             try {
                                 im.resize({
                                     srcData: file,
-                                    width: 256
+                                    width: 128
                                 }, function(err, binary, stderr) {
                                     if (err) {
                                         util.inspect(err);
-                                        res.send('error generating thumb');
+                                        res.send('Error generating thumb.');
                                     }
                                     res.contentType('image/jpg');
                                     res.end(binary, 'binary');
                                     me.imageCache[imagePath] = binary;
                                 });
                             } catch (error) {
-                                console.log("Error: Make sure your OS has ImageMagic installed.");
+                                console.log("Error in cache entry generation.");
+                                console.log(error);
+                                console.log(error.stack);
                             }
                         });
                     }
