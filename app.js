@@ -1,7 +1,6 @@
 // Usage example with ExpressJS
 var gallery = require('./gallery'),
     express = require('express'),
-    multiparty = require('multiparty'),
     upload = require('./upload'),
     util = require('util'),
     busboy = require('connect-busboy'),
