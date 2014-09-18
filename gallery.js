@@ -1,10 +1,10 @@
-var fs = require('fs'),
+fvar fs = require('fs'),
     exif = require('./exif.js'),
     walk = require('walk'),
     util = require('util'),
     path = require('path'),
-    im = require('imagemagick')
-    nodeCache = require('node-cache');
+    cache = require('newcache')
+    im = require('imagemagick');
 
 var gallery = {
     /*
