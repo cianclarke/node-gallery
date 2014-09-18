@@ -3,7 +3,7 @@ var fs = require('fs'),
     walk = require('walk'),
     util = require('util'),
     path = require('path'),
-    cache = require('newcache')
+    nodeCache = require('node-cache')
     im = require('imagemagick');
 
 var gallery = {

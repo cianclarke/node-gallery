@@ -6,3 +6,4 @@ function albumSchema(mongoose) {
 		'images' : [String]
 	});
 }
+exports.albumSchema = albumSchema;
