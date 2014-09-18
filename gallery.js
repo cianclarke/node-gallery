@@ -1,4 +1,4 @@
-fvar fs = require('fs'),
+var fs = require('fs'),
     exif = require('./exif.js'),
     walk = require('walk'),
     util = require('util'),
