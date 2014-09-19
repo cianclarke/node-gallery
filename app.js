@@ -4,7 +4,6 @@ var gallery = require('./gallery'),
     upload = require('./upload'),
     util = require('util'),
     busboy = require('connect-busboy'),
-    db = require('./db'),
     port = 3000;
 var app = (parseFloat(express.version) < 3.0) ? express.createServer() : express();
 app.use(busboy());

@@ -3,7 +3,8 @@ var fs = require('fs'),
     walk = require('walk'),
     util = require('util'),
     path = require('path'),
-    nodeCache = require('node-cache')
+    nodeCache = require('node-cache'),
+    db = require('./db'),
     im = require('imagemagick');
 
 var gallery = {
@@ -47,7 +48,7 @@ var gallery = {
 
     /*
      * Reference to db connection
-     */
+     */ 
 
     db: undefined,
 
@@ -62,6 +63,7 @@ var gallery = {
      */
     readFiles: function(params, cb) {
         var files = [],
+            dircount = 0,
             directoryPath = (this.static) ? this.static + "/" + this.directory : this.directory,
             me = this;
         var walker = walk.walk(directoryPath, {
@@ -72,6 +74,7 @@ var gallery = {
             // * type
             // * error
             // * name
+            dircount++;
             next();
         });
         walker.on('file', function(root, stat, next) {
@@ -90,6 +93,7 @@ var gallery = {
             return next();
         });
         walker.on('end', function() {
+            console.log("Found "+files.length+ " files in "+dircount+" directories.");
             return cb(null, files);
         });
     },
@@ -222,7 +226,6 @@ var gallery = {
         var me = this,
             directory = params.directory,
             staticDir = params.static;
-            db = params.db;
         if (!cb || typeof cb !== "function") {
             cb = function(err) {
                 if (err) {
@@ -247,13 +250,16 @@ var gallery = {
         }
         this.rootURL = params.rootURL;
         this.directory = directory;
-        console.log("Startup parameters:");
+        console.log("Startup");
+        console.log(".......");
         this.static = staticDir;
         console.log("Resource directory:"+this.static);
         console.log("Directory which will be part of gallery url:"+this.directory);
         this.name = params.name || this.name;
         console.log("Name of the gallery:"+this.name);
         this.filter = params.filter || this.filter;
+        console.log("Waiting for connection...");
+        while(db.isConnected()) { console.log(".")};
         this.readFiles(null, function(err, files) {
             if (err) {
                 return cb(err);
