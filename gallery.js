@@ -45,7 +45,11 @@ var gallery = {
      */
     imageCache: new nodeCache(),
 
-    db: undefined;
+    /*
+     * Reference to db connection
+     */
+
+    db: undefined,
 
     resourceType : {
         IMAGE : 0,
