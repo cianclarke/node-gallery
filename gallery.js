@@ -31,7 +31,7 @@ var gallery = {
     /*
      * Name of our gallery
      */
-    name: 'Photo Gallery',
+    name: 'Ekukka Photo Gallery',
     /*
      * Image to display when no thumbnail could be located
      */
@@ -44,6 +44,9 @@ var gallery = {
      * Object used to store binary chunks that represent image thumbs
      */
     imageCache: new nodeCache(),
+
+    db: undefined;
+
     resourceType : {
         IMAGE : 0,
         ALBUM : 1,
@@ -215,6 +218,7 @@ var gallery = {
         var me = this,
             directory = params.directory,
             staticDir = params.static;
+            db = params.db;
         if (!cb || typeof cb !== "function") {
             cb = function(err) {
                 if (err) {
@@ -239,8 +243,12 @@ var gallery = {
         }
         this.rootURL = params.rootURL;
         this.directory = directory;
+        console.log("Startup parameters:");
         this.static = staticDir;
+        console.log("Resource directory:"+this.static);
+        console.log("Directory which will be part of gallery url:"+this.directory);
         this.name = params.name || this.name;
+        console.log("Name of the gallery:"+this.name);
         this.filter = params.filter || this.filter;
         this.readFiles(null, function(err, files) {
             if (err) {
