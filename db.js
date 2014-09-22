@@ -40,7 +40,23 @@ function albumExists(hashKey) {
 }
 
 function newImage(attributes) {
-	return null;
+	var Image = mongoose.model('Image', imageSchema);
+	var image = new Image(attributes);
+	image.save();
+	return image;
+}
+
+function imageExists(album, name) {
+	mongoose.model('Image', imageSchema).find({ albumHash: album, imageName: name}, function(err,result) {
+		if(err) {
+			console.log("Error in determining if image with ")
+		}
+		if(!result) {
+			return false;
+		} else {
+			return true;
+		}
+ 	});
 }
 
 function updateImage(attributes) {
@@ -59,3 +75,5 @@ albumSchema.method = {
 exports.isConnected = isConnected;
 exports.newAlbum = newAlbum;
 exports.albumExists = albumExists;
+exports.newImage = newImage;
+exports.imageExists = imageExists;

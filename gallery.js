@@ -118,8 +118,8 @@ var gallery = {
             var file = files[i],
                 dirHashKey = "";
             fullDirOfFile = _fullDirPathOf(file);
-            console.log("Processing "+fullDirOfFile);
             if(fs.lstatSync(fullDirOfFile).isDirectory()) {
+                console.log("Processing directory "+fullDirOfFile);
                 dirHashKey = md5(_fullPathOf(file));
                 if (!db.albumExists(dirHashKey)) {
                     console.log("Found a non-existing album with key "+dirHashKey);
@@ -134,29 +134,29 @@ var gallery = {
                          albums: []
                      };
                     // return should be cached...
-                    var toBeSaved = db.newAlbum(newAlbum);
+                    addedAlbum = db.newAlbum(newAlbum);
 
                 } else {
                     console.log("Albums with hash "+dirHashKey+" already exists.");
                 }
-            }/*
+            } 
             var filepath = file.rootDir + '/' + file.name
-            
             var photoName = file.name.replace(/.[^\.]+$/, "");
+            console.log("Processing photo: "+filepath);
             var photo = {
                 name: photoName,
                 path: filepath
             };
-            (function(photo, curAlbum) {
-                var fullPath = gallery.directory + "/" + photo.path;
-                fullPath = (gallery.static) ? gallery.static + "/" + fullPath : fullPath;
+            var albumHash = md5(_fullPathOf(file));
+            (function(photo) {
+                var fullPath = _fullPathOf(file);
                 exif(fullPath, photo, function(err, exifPhoto) {
-                        // no need to do anything with our result - we've altered
-                        // the photo object..
+                    // no need to do anything with our result - we've altered
+                    // the photo object..
                 });
-            })(photo, curAlbum);
-            
-            curAlbum.photos.push(photo);
+            })(photo);
+            if(!db.imageExists(albumHash, photo.name)) {
+                addedImage=db.newImage(photo);
             }
         }
         // Function to iterate over our completed albums, calling _buildThumbnails on each
@@ -185,7 +185,7 @@ var gallery = {
                     // TODO: No image could be found
                     return me.noThumbnail;
                 }
-            }*/
+            }
         }
         //_recurseOverAlbums(albums);
         return cb(null);

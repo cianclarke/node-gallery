@@ -3,7 +3,7 @@ function albumSchema(mongoose) {
 		'name' : String,
 		'prettyName' : String,
 		'description' : String,
-		'hash' : String,
+		'hash' : {type: String, required: 'hash is required', unique: true},
 		'path' : String,
 		'photos' : [String],
 		'albums' : [String]
