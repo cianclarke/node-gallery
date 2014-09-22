@@ -16,7 +16,8 @@
     "express": "3.0",
     "ejs": "*",
     "exif": "git://github.com/cianclarke/node-exif.git",
-    "imagemagick" : "*"
+    "imagemagick": "*",
+    "uniq": "~1.0.1"
   },
   "scripts": {
     "test": "node test/tests.js",

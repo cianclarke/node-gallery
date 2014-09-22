@@ -64,19 +64,11 @@ var gallery = {
      */
     readFiles: function(params, cb) {
         var files = [],
-            dircount = 0,
+            directories = [],
             directoryPath = (this.static) ? this.static + "/" + this.directory : this.directory,
             me = this;
         var walker = walk.walk(directoryPath, {
             followLinks: false
-        });
-        walker.on("directories", function(root, dirStatsArray, next) {
-            // dirStatsArray is an array of `stat` objects with the additional attributes
-            // * type
-            // * error
-            // * name
-            dircount++;
-            next();
         });
         walker.on('file', function(root, stat, next) {
             if (stat.name.match(me.filter) != null) {
@@ -91,17 +83,20 @@ var gallery = {
                 rootDir: rootlessRoot
             };
             files.push(file);
+            directories.push(rootlessRoot);
             return next();
         });
         walker.on('end', function() {
             console.log("Found "+files.length+ " files in "+dircount+" directories.");
-            return cb(null, files);
+            directories.sort();
+            require('uniq')(directories);
+            return cb(null, files, directories);
         });
     },
     /*
      * Private function to build an albums object from the files[] array
      */
-    buildAlbums: function(files, cb) {
+    buildAlbums: function(files, directories, cb) {
         function _fullDirPathOf(file) {
             return "./"+gallery.static + "/" +gallery.directory + "/" + file.rootDir; 
         }
@@ -110,26 +105,28 @@ var gallery = {
             return "./"+gallery.static + "/" +gallery.directory + "/" + file.rootDir + "/"+file.name;    
         }
 
+        function _addStaticPrefix(albumdir) {
+            return "./"+gallery.static + "/" +gallery.directory + "/" + albumDir;
+        }
+
         function _generateAlbumName(file) {
             return file.rootDir;
         }
 
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i],
-                dirHashKey = "";
-            fullDirOfFile = _fullDirPathOf(file);
-            if(fs.lstatSync(fullDirOfFile).isDirectory()) {
-                console.log("Processing directory "+fullDirOfFile);
-                dirHashKey = md5(_fullPathOf(file));
+        for (var d = 0; d < directories.length; d++) {
+            var dirHashKey = "";
+            if(fs.lstatSync(_addStaticPrefix(directories[d])).isDirectory()) {
+                console.log("Processing directory "+directories[d]);
+                dirHashKey = md5(directories[d]);
                 if (!db.albumExists(dirHashKey)) {
                     console.log("Found a non-existing album with key "+dirHashKey);
                     // If we've never seen this album before, let's create it
                     var newAlbum = {
-                         name: _generateAlbumName(file),
-                         prettyName: decodeURIComponent(_generateAlbumName(file)),
+                         name: _generateAlbumName(directories[d]),
+                         prettyName: decodeURIComponent(directories[d]),
                          description: "",
                          hash: dirHashKey,
-                         path: file,
+                         path: "/"+gallery.directory+"/"+directories[d],
                          photos: [],
                          albums: []
                      };
@@ -139,12 +136,16 @@ var gallery = {
                 } else {
                     console.log("Albums with hash "+dirHashKey+" already exists.");
                 }
-            } 
+            }
+        }
+
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+             
             var filepath = file.rootDir + '/' + file.name
-            var photoName = file.name.replace(/.[^\.]+$/, "");
             console.log("Processing photo: "+filepath);
             var photo = {
-                imageName: photoName,
+                imageName: file.name,
                 albumHash: md5(_fullPathOf(file)),
                 imageFilename: filepath
             };
@@ -156,8 +157,11 @@ var gallery = {
                 });
             })(photo);
 
-            if(!db.imageExists(photo.albumHash, photo.name)) {
+            if(!db.imageExists(photo.albumHash, photo.imageName)) {
                 addedImage=db.newImage(photo);
+                console.log("Image not found, adding: "+photo.imageName);
+            } else {
+                console.log("Persisted a new image: "+photo.imageName);
             }
         }
         // Function to iterate over our completed albums, calling _buildThumbnails on each
@@ -232,11 +236,11 @@ var gallery = {
         this.filter = params.filter || this.filter;
         console.log("Waiting for connection...");
         while(db.isConnected()) { console.log(".")};
-        this.readFiles(null, function(err, files) {
+        this.readFiles(null, function(err, files, directories) {
             if (err) {
                 return cb(err);
             }
-            me.buildAlbums(files, function(err) {
+            me.buildAlbums(files,directories, function(err) {
                 return cb(err);
             })
         });

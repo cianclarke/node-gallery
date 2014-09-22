@@ -31,9 +31,12 @@ function albumExists(hashKey) {
 		if(err) {
 			console.log("Error in determining if album with has "+hashKey+" exists");
 		}
+		console.log("Result is: "+result);
 		if(!result) {
+			console.log("...So returning false");
 			return false;
 		} else {
+			console.log("...so returning true");
 			return true;
 		}
 	});
