@@ -5,7 +5,8 @@ var fs = require('fs'),
     path = require('path'),
     nodeCache = require('node-cache'),
     db = require('./db'),
-    im = require('imagemagick');
+    im = require('imagemagick'),
+    md5 = require('MD5');
 
 var gallery = {
     /*
@@ -101,91 +102,61 @@ var gallery = {
      * Private function to build an albums object from the files[] array
      */
     buildAlbums: function(files, cb) {
-        var albums = {
-            name: this.name,
-            prettyName: this.name,
-            isRoot: true,
-            path: this.directory,
-            photos: [],
-            albums: []
-        },
-            dirHash = {};
+        function _fullDirPathOf(file) {
+            return "./"+gallery.static + "/" +gallery.directory + "/" + file.rootDir; 
+        }
+
+        function _fullPathOf(file) {
+            return "./"+gallery.static + "/" +gallery.directory + "/" + file.rootDir + "/"+file.name;    
+        }
+
+        function _generateAlbumName(file) {
+            return file.rootDir;
+        }
+
         for (var i = 0; i < files.length; i++) {
-            // Process a single file
             var file = files[i],
-                dirs = file.rootDir.split("/"),
-                dirHashKey = "",
-                curAlbum = albums; // reset current album to root at each new file
-            // Iterate over it's directory path, checking if we've got an album for each
-            // ""!==dirs[0] as we don't want to iterate if we have a file that is a photo at root
-            for (var j = 0; j < dirs.length && dirs[0] !== ""; j++) {
-                var curDir = dirs[j];
-                dirHashKey += curDir;
-                if (!dirHash.hasOwnProperty(dirHashKey)) {
+                dirHashKey = "";
+            fullDirOfFile = _fullDirPathOf(file);
+            console.log("Processing "+fullDirOfFile);
+            if(fs.lstatSync(fullDirOfFile).isDirectory()) {
+                dirHashKey = md5(_fullPathOf(file));
+                if (!db.albumExists(dirHashKey)) {
+                    console.log("Found a non-existing album with key "+dirHashKey);
                     // If we've never seen this album before, let's create it
-                    var currentAlbumPath = dirs.slice(0, j + 1).join('/'); // reconstruct the current path with the path slashes
-                    dirHash[dirHashKey] = true // TODO - consider binding the album to this hash, and even REDIS-ing..
                     var newAlbum = {
-                        name: curDir,
-                        prettyName: decodeURIComponent(curDir),
-                        description: "",
-                        hash: dirHashKey,
-                        path: currentAlbumPath,
-                        photos: [],
-                        albums: []
-                    };
-                    curAlbum.albums.push(newAlbum);
-                    curAlbum = newAlbum;
+                         name: _generateAlbumName(file),
+                         prettyName: decodeURIComponent(_generateAlbumName(file)),
+                         description: "",
+                         hash: dirHashKey,
+                         path: file,
+                         photos: [],
+                         albums: []
+                     };
+                    // return should be cached...
+                    var toBeSaved = db.newAlbum(newAlbum);
+
                 } else {
-                    // we've seen this album, we need to drill into it
-                    // search for the right album & update curAlbum
-                    var curAls = curAlbum.albums;
-                    for (var k = 0; k < curAls.length; k++) {
-                        var al = curAls[k];
-                        if (al.hash === dirHashKey) {
-                            curAlbum = al;
-                            break;
-                        }
-                    }
+                    console.log("Albums with hash "+dirHashKey+" already exists.");
                 }
-            }
+            }/*
             var filepath = file.rootDir + '/' + file.name
-            if (file.name == "info.json") {
-                var fullPath = gallery.directory + "/" + filepath;
+            
+            var photoName = file.name.replace(/.[^\.]+$/, "");
+            var photo = {
+                name: photoName,
+                path: filepath
+            };
+            (function(photo, curAlbum) {
+                var fullPath = gallery.directory + "/" + photo.path;
                 fullPath = (gallery.static) ? gallery.static + "/" + fullPath : fullPath;
-                var info = fs.readFileSync(fullPath);
-                try {
-                    info = JSON.parse(info);
-                } catch (e) {
-                    // If invalid JSON, just bail..
-                    continue;
-                }
-                curAlbum.description = info.description || null;
-                curAlbum.prettyName = info.name || curAlbum.prettyName;
-                if (info.thumb || info.thumbnail) {
-                    var thumbnailImage = info.thumb || info.thumbnail;
-                    thumbnailImage = curAlbum.path + "/" + thumbnailImage;
-                    curAlbum.thumb = thumbnailImage;
-                }
-            } else {
-                var photoName = file.name.replace(/.[^\.]+$/, "");
-                var photo = {
-                    name: photoName,
-                    path: filepath
-                };
-                //curAlbum.photos.push(photo);
-                // we have a photo object - let's try get it's exif data. We've
-                // already pushed into curAlbum, no rush getting exif now!
-                // Create a closure to give us scope to photo
-                (function(photo, curAlbum) {
-                    var fullPath = gallery.directory + "/" + photo.path;
-                    fullPath = (gallery.static) ? gallery.static + "/" + fullPath : fullPath;
-                    exif(fullPath, photo, function(err, exifPhoto) {
+                exif(fullPath, photo, function(err, exifPhoto) {
                         // no need to do anything with our result - we've altered
                         // the photo object..
-                    });
-                })(photo, curAlbum);
-                curAlbum.photos.push(photo);
+                });
+            })(photo, curAlbum);
+            
+            curAlbum.photos.push(photo);
             }
         }
         // Function to iterate over our completed albums, calling _buildThumbnails on each
@@ -214,10 +185,10 @@ var gallery = {
                     // TODO: No image could be found
                     return me.noThumbnail;
                 }
-            }
+            }*/
         }
-        _recurseOverAlbums(albums);
-        return cb(null, albums);
+        //_recurseOverAlbums(albums);
+        return cb(null);
     },
     /*
      * Public API to node-gallery, currently just returns JSON block
@@ -264,9 +235,8 @@ var gallery = {
             if (err) {
                 return cb(err);
             }
-            me.buildAlbums(files, function(err, album) {
-                me.album = album;
-                return cb(err, album);
+            me.buildAlbums(files, function(err) {
+                return cb(err);
             })
         });
     },

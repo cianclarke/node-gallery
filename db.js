@@ -19,6 +19,34 @@ function isConnected() {
 	return connected;
 }
 
+function newAlbum(attributes) {
+	var Album = mongoose.model('Album', albumSchema);
+	var album = new Album(attributes);
+	album.save();
+	return album;
+}
+
+function albumExists(hashKey) {
+	mongoose.model('Album',albumSchema).find({ hash: hashKey}, function(err,result) {
+		if(err) {
+			console.log("Error in determining if album with has "+hashKey+" exists");
+		}
+		if(!result) {
+			return false;
+		} else {
+			return true;
+		}
+	});
+}
+
+function newImage(attributes) {
+	return null;
+}
+
+function updateImage(attributes) {
+
+}
+
 imageSchema.methods = {
 }
 
@@ -29,3 +57,5 @@ albumSchema.method = {
 		getPrintName: function() { return this.images.printName; }
 };
 exports.isConnected = isConnected;
+exports.newAlbum = newAlbum;
+exports.albumExists = albumExists;

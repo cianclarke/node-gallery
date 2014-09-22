@@ -1,9 +1,12 @@
 function albumSchema(mongoose) {
 	return mongoose.Schema({
-		'albumName' : String,
-		'printName' : String,
-		'fsPath' : String,
-		'images' : [String]
+		'name' : String,
+		'prettyName' : String,
+		'description' : String,
+		'hash' : String,
+		'path' : String,
+		'photos' : [String],
+		'albums' : [String]
 	});
 }
 exports.albumSchema = albumSchema;
