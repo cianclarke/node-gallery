@@ -144,10 +144,10 @@ var gallery = {
             var photoName = file.name.replace(/.[^\.]+$/, "");
             console.log("Processing photo: "+filepath);
             var photo = {
-                name: photoName,
-                path: filepath
+                imageName: photoName,
+                albumHash: md5(_fullPathOf(file)),
+                imageFilename: filepath
             };
-            var albumHash = md5(_fullPathOf(file));
             (function(photo) {
                 var fullPath = _fullPathOf(file);
                 exif(fullPath, photo, function(err, exifPhoto) {
@@ -155,7 +155,8 @@ var gallery = {
                     // the photo object..
                 });
             })(photo);
-            if(!db.imageExists(albumHash, photo.name)) {
+
+            if(!db.imageExists(photo.albumHash, photo.name)) {
                 addedImage=db.newImage(photo);
             }
         }
