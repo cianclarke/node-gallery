@@ -1,0 +1,14 @@
+<html>
+<form action = "/receive" method = "POST" enctype="multipart/form-data">
+	<% if (album.albums.length>0){ %>
+  <h2>Select destination:</h2>
+  <select name = "albumName">
+    <% album.albums.forEach(function(album){ %>
+          <option value = "/<%= directory %>/<%= album.name %>"/><%= album.prettyName %></option>
+    <% }) %>
+  </select>
+<% } %>
+	Select images: <input type="file" name="img" multiple>
+  <input type="submit">
+ </form>
+</html>
