@@ -12,11 +12,12 @@
     "node": ">=0.6.2"
   },
   "dependencies": {
-    "walk": "*",
-    "express": "4.10.7",
     "ejs": "2.0.8",
     "exif": "git://github.com/cianclarke/node-exif.git",
-    "imagemagick" : "0.1.3"
+    "express": "4.10.7",
+    "imagemagick": "0.1.3",
+    "underscore": "^1.7.0",
+    "walk": "*"
   },
   "scripts": {
     "test": "node test/tests.js",

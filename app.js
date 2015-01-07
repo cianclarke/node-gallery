@@ -2,23 +2,17 @@
 var gallery = require('./gallery'),
 express = require('express'),
 util = require('util'),
+fs = require('fs'),
 port = 3000;
 
 var app = express();
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/resources'));
-app.use(gallery.middleware({static: 'resources', directory: '/photos', rootURL: "/gallery"}));
 
-app.get('/', function(req, res){
-  res.redirect('/gallery');
-});
+app.use('/gallery', require('./lib/gallery.js')({
+  albumRoot : 'resources/photos'
+}));
 
-app.get('/gallery*', function(req, res){
-  var data = req.gallery;
-  data.layout = false; // Express 2.5.* support, don't look for layout.ejs
-
-  res.render(data.type + '.ejs', data);
-});
 
 app.listen(port);
 console.log('node-gallery listening on localhost:' + port);
