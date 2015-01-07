@@ -330,7 +330,6 @@ var gallery = {
 
     var dirs = albumPath.split('/');
 
-
     for (var i=0; i<dirs.length; i++){
       var dir = dirs[i];
       var aChildren = album.albums;

@@ -4,13 +4,10 @@ express = require('express'),
 util = require('util'),
 port = 3000;
 
-var app = (parseFloat(express.version)<3.0) ? express.createServer() : express();
+var app = express();
 app.set('view engine', 'ejs');
-
-app.configure(function(){
-  app.use(express.static(__dirname + '/resources'));
-  app.use(gallery.middleware({static: 'resources', directory: '/photos', rootURL: "/gallery"}));
-});
+app.use(express.static(__dirname + '/resources'));
+app.use(gallery.middleware({static: 'resources', directory: '/photos', rootURL: "/gallery"}));
 
 app.get('/', function(req, res){
   res.redirect('/gallery');
