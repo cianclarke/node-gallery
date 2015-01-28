@@ -20,6 +20,7 @@ Usage
 =====
 Node gallery can be used standalone, or in an existing node.js application. The example code has support for the Openshift and Heroku PaaS. 
 ## Standalone
+Node Gallery supports deploys to OpenShift and Heroku out of the box.
 Modify [examples/app.js](examples/app.js) to your liking, add your albums & images to `resources/photos` & run using:
     
 	node example/app.js
@@ -67,6 +68,8 @@ For albums and photos, to receive a JSON response rather than a rendered HTML pa
     
 Examples
 ===================
+Node Gallery with out-of-the-box configuration is deployed to Heroku - [see it here.  ](http://nodegallery.herokuapp.com/gallery)
+
 A usage example using node-gallery with Express can be found in [examples/app.js](examples/app.js).
 
 Photos
