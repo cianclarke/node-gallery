@@ -4,34 +4,34 @@
   <% if (i==breadcrumb.length-1){ %>
     <%= breadcrumb[i].name %>
   <% }else{ %>
-    <a href="<%= breadcrumb[i].url %>"> <%= breadcrumb[i].name %> &raquo; </a>
+    <a href="/<%= breadcrumb[i].url %>"> <%= breadcrumb[i].name %> &raquo; </a>
   <% } %>
 
 <% } %>
 
-<h1><%= photo.name %></h1>
+<h1><%= name %></h1>
 
-<img src="/<%= directory %>/<%= photo.path %>" alt="<%= photo.name%>"><br />
+<img src="/<%= src %>" alt="<%= name%>"><br />
 
-<% if (photo.exif && photo.exif.Description){ %>
-<%= photo.exif.Description%>
+<% if (exif && exif.Description){ %>
+<%= exif.Description%>
 <% }else{ %>
-<%= photo.name%>
+<%= name%>
 <% } %>
 
 
-<% if (photo.exif){ %>
+<% if (exif){ %>
 <section class="info">
   <h2>Info</h2>
   <table>
-    <% for (var key in photo.exif){ %>
+    <% for (var key in exif){ %>
     <% if (key!="Description"){ %>
     <tr>
       <td>
         <%= key %>
       </td>
       <td>
-        <%= photo.exif[key] %>
+        <%= exif[key] %>
       </td>
     </tr>
     <% } %>
