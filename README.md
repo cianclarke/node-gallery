@@ -29,20 +29,40 @@ Modify [examples/app.js](examples/app.js) to your liking, add your albums & imag
 Node Gallery exposes express style middleware, meaning it can be mounted to any route within your application.
 
     /*
-    @param {string} staticFiles The directory where your album starts - can contain photos or images
-    @param {string} urlRoot The root URL which you pass into the epxress router in app.use (no way of obtaining this otherwise)
-    @param {string} title Yup, you guessed it - the title to display on the root gallery
+    @param {string, required} staticFiles The directory where your album starts - can contain photos or images
+    @param {string, required} urlRoot The root URL which you pass into the epxress router in app.use (no way of obtaining this otherwise)
+    @param {string, optional} title Yup, you guessed it - the title to display on the root gallery
+    @param {boolean, optional} render Default to true. If explicitly set to false, rendering is left to the next function in the chain - see below. 
     */
     app.use('/gallery', require('node-gallery')({
       staticFiles : 'resources/photos',
       urlRoot : 'gallery', 
       title : 'Example Gallery'
-    }).middleware);
+    }));
 
 Now, you can access the gallery by going to your application's url /gallery - in the case of our example, http://localhost:3000/gallery. 
 
 ### Middleware Views
-The middleware renders the views in the `views` directory, but you can override these. `//TODO: How?`
+The middleware renders the views in the `views` directory by default, but you can override this behavior & provide your own view rendering by setting `render` to false.  
+When this happens, the gallery HTML is returned in `req.html`, the raw JSON data in `req.data`. 
+
+    app.use('/gallery', require('node-gallery')({
+      staticFiles : 'resources/photos',
+      urlRoot : 'gallery', 
+      title : 'Example Gallery',
+      render : false
+    }), function(req, res, next){
+      /*
+       We MUST add another middleware function to the chain when render is false. 
+       just return the raw HTML data - we could partial into another template here,
+       pass the JSON data into a template
+       */
+      return res.send(req.html);
+    });
+
+
+For a more detailed example, see [examples/app.js](examples/app.js).
+
 
 ### Middleware Routes
 There are three main routes exposed under whatever root directory you provide.  
@@ -68,9 +88,18 @@ For albums and photos, to receive a JSON response rather than a rendered HTML pa
     
 Examples
 ===================
-Node Gallery with out-of-the-box configuration is deployed to Heroku - [see it here.  ](http://nodegallery.herokuapp.com/gallery)
+Node Gallery with out-of-the-box configuration is deployed to Heroku - [see it here.](http://nodegallery.herokuapp.com/gallery)  
 
-A usage example using node-gallery with Express can be found in [examples/app.js](examples/app.js).
+A basic usage example showing how to use node-gallery with Express can be found in [examples/basic.js](examples/basic.js).  
+  
+A more advanced example, showing how to take control of the rendering of your pages is shown in [examples/app.js](examples/app.js).  
+  
+To try these examples:
+    
+    cd examples
+    npm install -d
+    node app.js # or node basic.js
+    
 
 Photos
 ===================

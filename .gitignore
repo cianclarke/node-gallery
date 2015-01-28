@@ -9,3 +9,4 @@
 /docs
 /docs/*
 node_modules
+npm-debug.log

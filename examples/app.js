@@ -4,15 +4,19 @@ port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000,
 host = process.env.OPENSHIFT_NODEJS_IP;
 
 var app = express();
+app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-app.use(express.static('resources'));
+app.use(express.static('./'));
 
 // In your project, this would be require('node-gallery')
 app.use('/gallery', require('../lib/gallery.js')({
   staticFiles : 'resources/photos',
   urlRoot : 'gallery',
-  title : 'Example Gallery'
-}).middleware);
+  title : 'Example Gallery',
+  render : false // 
+}), function(req, res, next){
+  return res.render('gallery', { galleryHtml : req.html });
+});
 
 
 app.listen(port, host);

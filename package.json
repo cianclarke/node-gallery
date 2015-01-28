@@ -19,8 +19,7 @@
     "underscore": "^1.7.0"
   },
   "scripts": {
-    "test": "node test/tests.js",
-    "start": "node examples/app.js"
+    "test": "node test/tests.js"
   },
   "devDependencies": {
     "colors": "1.0.3"
