@@ -1,40 +1,36 @@
-<link href="/css/gallery.css" rel="stylesheet" type="text/css">
-<link href="/css/theme.css" rel="stylesheet" type="text/css">
-<% if (!album.isRoot){ %>
+<link href="/<%= urlRoot %>/gallery.css" rel="stylesheet" type="text/css">
+<% if (!isRoot){ %>
   <% for (var i=0; i<breadcrumb.length; i++) { %>
   <% if (i==breadcrumb.length-1){ %>
   <%= breadcrumb[i].name %>
   <% }else{ %>
-  <a href="<%= breadcrumb[i].url %>"> <%= breadcrumb[i].name %> &raquo; </a>
+  <a href="/<%= breadcrumb[i].url %>"> <%= breadcrumb[i].name %> &raquo; </a>
   <% } %>
 
   <% } %>
 <% } %>
-<h1><%= album.prettyName %></h1>
-  <% if (album.description){ %>
-    <p><%- album.description %></p>
-  <% } %>
+<h1><%= name %></h1>
 
-  <% if (album.albums.length>0){ %>
+  <% if (albums.length>0){ %>
   <h2>Albums</h2>
   <ul class="albums">
-    <% album.albums.forEach(function(album){ %>
+    <% albums.forEach(function(album){ %>
       <li class="thumb">
-        <a href="<%= rootDir%>/<%= album.path%>">
-          <div class="image"><img src="/<%= directory %>/<%= album.thumb %>&tn=1" alt="<%= album.prettyName %>"><br /></div>
-          <span class="caption"><%= album.prettyName %></span>
+        <a href="/<%= album.url%>">
+          <div class="image"><img src="/<%= album.url %>?tn=1" alt="<%= album.name %>"><br /></div>
+          <span class="caption"><%= album.name %></span>
         </a>
       </li>
     <% }) %>
   </ul>
 <% } %>
-<% if (album.photos.length>0){ %>
+<% if (photos.length>0){ %>
   <h2>Photos</h2>
   <ul class="photos">
-    <% album.photos.forEach(function(photo){ %>
+    <% photos.forEach(function(photo){ %>
       <li class="thumb">
-        <a href="<%=rootDir %><%= photo.path %>">
-          <img src="/<%= directory %>/<%= photo.path %>&tn=1" alt="<%= photo.name%>"><br />
+        <a href="/<%= photo.url %>">
+          <img src="/<%= photo.src %>?tn=1" alt="<%= photo.name%>"><br />
           <%= photo.name%>
         </a>
       </li>
