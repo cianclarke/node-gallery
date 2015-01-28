@@ -20,7 +20,7 @@
     "underscore": "^1.7.0"
   },
   "scripts": {
-    "test": "node test/tests.js"
+    "test": "node test/test-gallery.js ; node test/test-album.js ; node test/test-photo.js"
   },
   "devDependencies": {
     "colors": "1.0.3"
