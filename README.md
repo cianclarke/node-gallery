@@ -37,7 +37,33 @@ Node Gallery exposes express style middleware, meaning it can be mounted to any 
       title : 'Example Gallery'
     }).middleware);
 
+Now, you can access the gallery by going to your application's url /gallery - in the case of our example, http://localhost:3000/gallery. 
 
+### Middleware Views
+The middleware renders the views in the `views` directory, but you can override these. `//TODO: How?`
+
+### Middleware Routes
+There are three main routes exposed under whatever root directory you provide.  
+
+#### JSON Responses
+For albums and photos, to receive a JSON response rather than a rendered HTML page, just send an `accept: application/json` header.
+
+**Album Pages**  
+
+    /:albumName/      
+    /:albumName/:subalbum  
+    /:albumName/:subalbum/:anothersubalbum  
+
+
+**Photo Pages**  
+    
+    /:albumName/photo/:photoName
+    /:albumName/:subalbum/photo/:photoName
+    
+**Image Files**  
+    
+    /:albumName/:subAlbum/:photoname.(png|jpg|tif|jpeg|gif)
+    
 Examples
 ===================
 A usage example using node-gallery with Express can be found in [examples/app.js](examples/app.js).
