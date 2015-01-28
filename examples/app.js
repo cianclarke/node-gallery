@@ -1,7 +1,5 @@
 // Usage example with ExpressJS
 var express = require('express'),
-util = require('util'),
-fs = require('fs'),
 port = 3000;
 
 var app = express();
@@ -13,7 +11,7 @@ app.use('/gallery', require('../lib/gallery.js')({
   staticFiles : 'resources/photos',
   urlRoot : 'gallery',
   title : 'Example Gallery'
-}));
+}).middleware);
 
 
 app.listen(port);
