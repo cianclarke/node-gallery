@@ -1,6 +1,7 @@
 // Usage example with ExpressJS
 var express = require('express'),
-port = 3000;
+port = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000,
+host = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
 var app = express();
 app.set('view engine', 'ejs');
@@ -14,5 +15,5 @@ app.use('/gallery', require('../lib/gallery.js')({
 }).middleware);
 
 
-app.listen(port);
-console.log('node-gallery listening on localhost:' + port);
+app.listen(port, host);
+console.log('node-gallery listening on ' + host + ':' + port);

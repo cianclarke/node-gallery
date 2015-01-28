@@ -18,12 +18,13 @@ Installation
     
 Usage    
 =====
-Node gallery can be used standalone, or in an existing node.js application. 
+Node gallery can be used standalone, or in an existing node.js application. The example code has support for the Openshift and Heroku PaaS. 
 ## Standalone
+Modify [examples/app.js](examples/app.js) to your liking, add your albums & images to `resources/photos` & run using:
     
-	// TODO Document
+	node example/app.js
 
-## Existing Application
+## In Existing Applications
 Node Gallery exposes express style middleware, meaning it can be mounted to any route within your application.
 
     /*
