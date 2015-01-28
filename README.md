@@ -19,11 +19,6 @@ Installation
 Usage    
 =====
 Node gallery can be used standalone, or in an existing node.js application. The example code has support for the Openshift and Heroku PaaS. 
-## Standalone
-Node Gallery supports deploys to OpenShift and Heroku out of the box.
-Modify [examples/app.js](examples/app.js) to your liking, add your albums & images to `resources/photos` & run using:
-    
-	node example/app.js
 
 ## In Existing Applications
 Node Gallery exposes express style middleware, meaning it can be mounted to any route within your application.
@@ -33,6 +28,10 @@ Node Gallery exposes express style middleware, meaning it can be mounted to any 
     @param {string, required} urlRoot The root URL which you pass into the epxress router in app.use (no way of obtaining this otherwise)
     @param {string, optional} title Yup, you guessed it - the title to display on the root gallery
     @param {boolean, optional} render Default to true. If explicitly set to false, rendering is left to the next function in the chain - see below. 
+    @param {string, optional} thumbnail.width Thumbnail image width, defaults '200'
+    @param {string, optional} thumbnail.height as above
+    @param {string, optional} image.width Large images width defaults '100%'
+    @param {string, optional} image.height as above
     */
     app.use('/gallery', require('node-gallery')({
       staticFiles : 'resources/photos',
@@ -42,7 +41,7 @@ Node Gallery exposes express style middleware, meaning it can be mounted to any 
 
 Now, you can access the gallery by going to your application's url /gallery - in the case of our example, http://localhost:3000/gallery. 
 
-### Middleware Views
+### Providing Views
 The middleware renders the views in the `views` directory by default, but you can override this behavior & provide your own view rendering by setting `render` to false.  
 When this happens, the gallery HTML is returned in `req.html`, the raw JSON data in `req.data`. 
 
@@ -66,9 +65,8 @@ For a more detailed example, see [examples/app.js](examples/app.js).
 
 ### Middleware Routes
 There are three main routes exposed under whatever root directory you provide.  
-
-#### JSON Responses
-For albums and photos, to receive a JSON response rather than a rendered HTML page, just send an `accept: application/json` header.
+  
+To receive **JSON Responses** rather than a rendered HTML page, just send an `accept: application/json` header. 
 
 **Album Pages**  
 
@@ -86,6 +84,15 @@ For albums and photos, to receive a JSON response rather than a rendered HTML pa
     
     /:albumName/:subAlbum/:photoname.(png|jpg|tif|jpeg|gif)
     
+## Running Standalone
+Node Gallery can be run standalone for testing.
+Modify [examples/app.js](examples/app.js) to your liking, then add your albums & images to `examples/resources/photos` & run using:
+    
+	cd example
+	npm install -d 
+	node app.js
+	
+
 Examples
 ===================
 Node Gallery with out-of-the-box configuration is deployed to Heroku - [see it here.](http://nodegallery.herokuapp.com/gallery)  
