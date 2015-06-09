@@ -30,8 +30,8 @@
     <% photos.forEach(function(photo){ %>
       <li class="thumb">
         <a href="/<%= photo.url %>">
-          <img src="/<%= photo.src %>?tn=1" alt="<%= photo.name%>"><br />
-          <%= photo.name%>
+          <div class="image"><img src="/<%= photo.src %>?tn=1" alt="<%= photo.name%>"><br /></div>
+          <span class="caption"><%= photo.name%></span>
         </a>
       </li>
     <% }) %>
