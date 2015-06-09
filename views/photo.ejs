@@ -1,6 +1,9 @@
 <link href="/css/gallery.css" rel="stylesheet" type="text/css">
 <link href="/css/theme.css" rel="stylesheet" type="text/css">
+
+<nav class="breadcrumb">
 <% for (var i=0; i<breadcrumb.length; i++) { %>
+
   <% if (i==breadcrumb.length-1){ %>
     <%= breadcrumb[i].name %>
   <% }else{ %>
@@ -8,16 +11,21 @@
   <% } %>
 
 <% } %>
+</nav>
 
-<h1><%= name %></h1>
+<h1 class="photo-title"><%= name %></h1>
 
-<img src="/<%= src %>?tn=0" alt="<%= name%>"><br />
+<figure>
+  <img src="/<%= src %>?tn=0" alt="<%= name%>">
+  <figcaption>
+    <% if (exif && exif.Description){ %>
+    <%= exif.Description%>
+    <% }else{ %>
+    <%= name%>
+    <% } %>
+  </figcaption>
+</figure>
 
-<% if (exif && exif.Description){ %>
-<%= exif.Description%>
-<% }else{ %>
-<%= name%>
-<% } %>
 
 
 <% if (exif){ %>
