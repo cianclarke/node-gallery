@@ -1,5 +1,6 @@
 <link href="/css/gallery.css" rel="stylesheet" type="text/css">
 <link href="/css/theme.css" rel="stylesheet" type="text/css">
+<div class="breadcrumb">
 <% for (var i=0; i<breadcrumb.length; i++) { %>
   <% if (i==breadcrumb.length-1){ %>
     <%= breadcrumb[i].name %>
@@ -8,8 +9,9 @@
   <% } %>
 
 <% } %>
+</div>
 
-<h1><%= name %></h1>
+<h1 class="title"><%= name %></h1>
 
 <div class="image"><img src="/<%= src %>?tn=0" alt="<%= name%>"></div>
 
