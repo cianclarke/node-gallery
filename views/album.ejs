@@ -1,4 +1,5 @@
 <link href="/<%= urlRoot %>/gallery.css" rel="stylesheet" type="text/css">
+<div class="breadcrumb">
 <% if (!isRoot){ %>
   <% for (var i=0; i<breadcrumb.length; i++) { %>
   <% if (i==breadcrumb.length-1){ %>
@@ -9,7 +10,8 @@
 
   <% } %>
 <% } %>
-<h1><%= name %></h1>
+</div>
+<h1 class="title"><%= name %></h1>
 
   <% if (albums.length>0){ %>
   <h2>Albums</h2>
@@ -30,8 +32,8 @@
     <% photos.forEach(function(photo){ %>
       <li class="thumb">
         <a href="/<%= photo.url %>">
-          <img src="/<%= photo.src %>?tn=1" alt="<%= photo.name%>"><br />
-          <%= photo.name%>
+          <div class="image"><img src="/<%= photo.src %>?tn=1" alt="<%= photo.name%>"><br /></div>
+          <span class="caption"><%= photo.name%></span>
         </a>
       </li>
     <% }) %>
