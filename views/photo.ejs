@@ -11,13 +11,13 @@
 
 <h1><%= name %></h1>
 
-<img src="/<%= src %>?tn=0" alt="<%= name%>"><br />
+<div class="image"><img src="/<%= src %>?tn=0" alt="<%= name%>"></div>
 
-<% if (exif && exif.Description){ %>
+<span class="caption"><% if (exif && exif.Description){ %>
 <%= exif.Description%>
 <% }else{ %>
 <%= name%>
-<% } %>
+<% } %></span>
 
 
 <% if (exif){ %>
