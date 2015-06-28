@@ -1,5 +1,4 @@
-<link href="/css/gallery.css" rel="stylesheet" type="text/css">
-<link href="/css/theme.css" rel="stylesheet" type="text/css">
+<link href="/<%= urlRoot %>/gallery.css" rel="stylesheet" type="text/css">
 
 <nav class="breadcrumb">
 <% for (var i=0; i<breadcrumb.length; i++) { %>
@@ -15,7 +14,7 @@
 
 <h1 class="photo-title"><%= name %></h1>
 
-<figure>
+<figure class="photo">
   <img src="/<%= src %>?tn=0" alt="<%= name%>">
   <figcaption>
     <% if (exif && exif.Description){ %>
