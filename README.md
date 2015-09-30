@@ -1,6 +1,8 @@
 Node Gallery
 ============
 
+http://cianclarke.github.io/node-gallery/
+
 NodeJS Photo Gallery built on Express 4.  
 Feed it a directory of photos, get back a JSON object & a styled photo gallery ready for the web.  
 
