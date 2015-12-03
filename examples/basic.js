@@ -10,4 +10,4 @@ app.use('/gallery', require('../lib/gallery.js')({
 }));
 
 app.listen(port);
-console.log('node-gallery listening on localhost:' + port);
+console.log('node-gallery listening on *:' + port);
