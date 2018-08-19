@@ -4,7 +4,7 @@
   "description": "NodeJS Photo Gallery using directory structure & exif info to output a gallery",
   "version": "1.1.0",
   "homepage": "http://www.github.com/cianclarke/node-gallery",
-  "license" : "MIT",
+  "license": "MIT",
   "repository": {
     "url": ""
   },
@@ -13,9 +13,9 @@
     "node": ">=0.6.2"
   },
   "dependencies": {
-    "ejs": "2.0.8",
+    "ejs": "2.5.5",
     "exif": "git://github.com/cianclarke/node-exif.git",
-    "express": "4.10.7",
+    "express": "^4.16.3",
     "gm": "^1.17.0",
     "imagemagick-stream": "^1.1.0",
     "memory-cache": "^0.1.1",
