@@ -11,8 +11,8 @@
     "node": ">=0.6.2"
   },
   "dependencies": {
-    "ejs": "2.0.8",
-    "express": "4.10.7"
+    "ejs": "3.1.7",
+    "express": "4.17.3"
   },
   "scripts": {
     "start": "node app.js"
